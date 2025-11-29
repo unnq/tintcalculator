@@ -51,8 +51,15 @@ const FILMS = [
     category: "Specialty Series",
     defaultPricePerSqFt: 14,
     compatibility: {
-      // single_pane_clear: "safe",
-      // dual_pane_low_e_surface_3: "conditional",
+      single_pane_clear: "safe",
+      single_pane_tinted: "safe",
+      single_dual_pane_laminated: "safe",
+      dual_pane_clear: "safe",
+      dual_pane_tinted: "safe",
+      dual_pane_low_e_surface_2: "safe",
+      dual_pane_low_e_surface_3: "not warranted",
+      triple_pane_clear: "not warranted",
+      tempered_heat_strengthened: "safe"
     }
   },
   {
@@ -60,7 +67,17 @@ const FILMS = [
     name: "All Season 45 PS",
     category: "Specialty Series",
     defaultPricePerSqFt: 13,
-    compatibility: {}
+    compatibility: {
+      single_pane_clear: "safe",
+      single_pane_tinted: "safe",
+      single_dual_pane_laminated: "safe",
+      dual_pane_clear: "safe",
+      dual_pane_tinted: "safe",
+      dual_pane_low_e_surface_2: "safe",
+      dual_pane_low_e_surface_3: "not warranted",
+      triple_pane_clear: "not warranted",
+      tempered_heat_strengthened: "safe"
+    }
   },
 
   // CLEAR VIEW
