@@ -31,61 +31,85 @@
         <section class="left-column">
           <!-- Job & Pricing Panel -->
           <section class="panel">
-            <h2>Job & Pricing</h2>
+  <h2>Job & Pricing</h2>
 
-            <div class="field-row">
-              <div class="field">
-                <label for="jobName">Job name / reference</label>
-                <input id="jobName" type="text" placeholder="e.g. Smith Residence – Front Windows" />
-              </div>
-            </div>
+  <div class="field-row">
+    <div class="field">
+      <label for="jobName">Job name / reference</label>
+      <input id="jobName" type="text" placeholder="e.g. Smith Residence – Front Windows" />
+    </div>
+  </div>
 
-            <div class="field-row">
-              <div class="field">
-                <label for="customerEmail">Customer email</label>
-                <input id="customerEmail" type="email" placeholder="customer@example.com" />
-              </div>
-              <div class="field">
-                <label for="customerPhone">Customer phone</label>
-                <input id="customerPhone" type="tel" placeholder="(555) 555-5555" />
-              </div>
-            </div>
+  <div class="field-row">
+    <div class="field">
+      <label for="customerEmail">Customer email</label>
+      <input id="customerEmail" type="email" placeholder="customer@example.com" />
+    </div>
+    <div class="field">
+      <label for="customerPhone">Customer phone</label>
+      <input id="customerPhone" type="tel" placeholder="(555) 555-5555" />
+    </div>
+  </div>
 
-            <div class="field-row">
-              <div class="field">
-                <label for="customerAddress">Customer address</label>
-                <input id="customerAddress" type="text" placeholder="123 Main St, City, CA 90000" />
-              </div>
-            </div>
+  <div class="field-row">
+    <div class="field">
+      <label for="customerAddress">Customer address</label>
+      <input id="customerAddress" type="text" placeholder="123 Main St, City, CA 90000" />
+    </div>
+  </div>
 
-            <div class="field-row">
-              <div class="field">
-                <label for="defaultPricePerSqFt">Default price per sq ft ($)</label>
-                <input
-                  id="defaultPricePerSqFt"
-                  type="number"
-                  min="0"
-                  step="0.25"
-                  value="12"
-                />
-              </div>
-              <div class="field">
-                <label for="taxRate">Tax rate (%)</label>
-                <input
-                  id="taxRate"
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value="8.75"
-                />
-              </div>
-            </div>
+  <!-- NEW: film / glass / compatibility row -->
+  <div class="field-row">
+    <div class="field">
+      <label for="filmSelect">Film</label>
+      <select id="filmSelect">
+        <!-- options injected by JS -->
+      </select>
+    </div>
+    <div class="field">
+      <label for="glassTypeSelect">Glass type</label>
+      <select id="glassTypeSelect">
+        <!-- options injected by JS -->
+      </select>
+    </div>
+    <div class="field field-status">
+      <label>Film to glass</label>
+      <div id="filmGlassStatus" class="status-pill status-unknown">
+        <span class="status-dot"></span>
+        <span id="filmGlassStatusText">Select film &amp; glass</span>
+      </div>
+    </div>
+  </div>
 
-            <p class="helper-text">
-              Dimensions are entered in inches and automatically converted to square feet.
-              Each window row has its own price per sq ft.
-            </p>
-          </section>
+  <div class="field-row">
+    <div class="field">
+      <label for="defaultPricePerSqFt">Default price per sq ft ($)</label>
+      <input
+        id="defaultPricePerSqFt"
+        type="number"
+        min="0"
+        step="0.25"
+        value="12"
+      />
+    </div>
+    <div class="field">
+      <label for="taxRate">Tax rate (%)</label>
+      <input
+        id="taxRate"
+        type="number"
+        min="0"
+        step="0.01"
+        value="8.75"
+      />
+    </div>
+  </div>
+
+  <p class="helper-text">
+    Dimensions are entered in inches and automatically converted to square feet.
+    Each window row has its own price per sq ft.
+  </p>
+</section>
+
 
           <!-- Windows Table Panel -->
           <section class="panel">
