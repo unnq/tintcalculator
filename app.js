@@ -1,10 +1,13 @@
-// app.js - Window Tint Estimate Calculator (row-level price per sq ft)
+// app.js - Window Tint Estimate + Quote
 
 document.addEventListener("DOMContentLoaded", () => {
   const windowsTbody = document.getElementById("windowsTbody");
   const addWindowBtn = document.getElementById("addWindowBtn");
 
   const jobNameInput = document.getElementById("jobName");
+  const customerEmailInput = document.getElementById("customerEmail");
+  const customerPhoneInput = document.getElementById("customerPhone");
+  const customerAddressInput = document.getElementById("customerAddress");
   const defaultPricePerSqFtInput = document.getElementById("defaultPricePerSqFt");
   const taxRateInput = document.getElementById("taxRate");
 
@@ -16,6 +19,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const subtotalEl = document.getElementById("subtotal");
   const taxAmountEl = document.getElementById("taxAmount");
   const grandTotalEl = document.getElementById("grandTotal");
+
+  // Quote DOM refs
+  const quoteJobName = document.getElementById("quoteJobName");
+  const quoteCustomerEmail = document.getElementById("quoteCustomerEmail");
+  const quoteCustomerPhone = document.getElementById("quoteCustomerPhone");
+  const quoteCustomerAddress = document.getElementById("quoteCustomerAddress");
+  const quoteIdEl = document.getElementById("quoteId");
+  const quoteDateEl = document.getElementById("quoteDate");
+  const quoteTotalSqFtEl = document.getElementById("quoteTotalSqFt");
+  const quoteTotalWindowsEl = document.getElementById("quoteTotalWindows");
+  const quoteSubtotalEl = document.getElementById("quoteSubtotal");
+  const quoteTaxEl = document.getElementById("quoteTax");
+  const quoteGrandTotalEl = document.getElementById("quoteGrandTotal");
+  const quoteAvgPriceEl = document.getElementById("quoteAvgPrice");
+  const quoteTbody = document.getElementById("quoteTbody");
+
+  const printQuoteBtn = document.getElementById("printQuoteBtn");
+
+  // Tabs
+  const tabButtons = document.querySelectorAll(".tab-btn");
+  const tabPanels = document.querySelectorAll(".tab-panel");
 
   const currencyFmt = new Intl.NumberFormat("en-US", {
     style: "currency",
@@ -133,12 +157,86 @@ document.addEventListener("DOMContentLoaded", () => {
     windowsTbody.appendChild(tr);
   }
 
+  function updateQuotePreview(rows, totals) {
+    const {
+      totalWindows,
+      totalSqFt,
+      subtotal,
+      taxAmount,
+      grandTotal,
+      avgPricePerSqFt
+    } = totals;
+
+    // Customer details
+    const jobNameVal = jobNameInput.value.trim();
+    const emailVal = customerEmailInput.value.trim();
+    const phoneVal = customerPhoneInput.value.trim();
+    const addressVal = customerAddressInput.value.trim();
+
+    quoteJobName.textContent = jobNameVal || "Window tint installation";
+    quoteCustomerEmail.textContent = emailVal || "–";
+    quoteCustomerPhone.textContent = phoneVal || "–";
+    quoteCustomerAddress.textContent = addressVal || "–";
+
+    // High-level stats
+    quoteTotalSqFtEl.textContent = `${numberFmt.format(totalSqFt)} sq ft`;
+    quoteTotalWindowsEl.textContent = totalWindows;
+    quoteSubtotalEl.textContent = currencyFmt.format(subtotal);
+    quoteTaxEl.textContent = currencyFmt.format(taxAmount);
+    quoteGrandTotalEl.textContent = currencyFmt.format(grandTotal);
+    quoteAvgPriceEl.textContent = currencyFmt.format(avgPricePerSqFt || 0);
+
+    // Line items table
+    quoteTbody.innerHTML = "";
+
+    rows.forEach((row) => {
+      const tr = document.createElement("tr");
+
+      const labelTd = document.createElement("td");
+      labelTd.textContent = row.label || "Window";
+
+      const qtyTd = document.createElement("td");
+      qtyTd.textContent = row.qty.toString();
+
+      const sizeTd = document.createElement("td");
+      if (row.widthIn > 0 && row.heightIn > 0) {
+        sizeTd.textContent =
+          `${numberFmt.format(row.widthIn)}" × ${numberFmt.format(row.heightIn)}"`;
+      } else {
+        sizeTd.textContent = "–";
+      }
+
+      const rowSqFtTd = document.createElement("td");
+      rowSqFtTd.textContent = numberFmt.format(row.rowSqFt);
+      rowSqFtTd.classList.add("numeric-cell");
+
+      const priceTd = document.createElement("td");
+      priceTd.textContent = currencyFmt.format(row.pricePerSqFt || 0);
+      priceTd.classList.add("numeric-cell");
+
+      const rowCostTd = document.createElement("td");
+      rowCostTd.textContent = currencyFmt.format(row.rowCost || 0);
+      rowCostTd.classList.add("numeric-cell");
+
+      tr.appendChild(labelTd);
+      tr.appendChild(qtyTd);
+      tr.appendChild(sizeTd);
+      tr.appendChild(rowSqFtTd);
+      tr.appendChild(priceTd);
+      tr.appendChild(rowCostTd);
+
+      quoteTbody.appendChild(tr);
+    });
+  }
+
   function recalcAll() {
     const taxRate = parseNumber(taxRateInput.value);
 
     let totalWindows = 0;
     let totalSqFt = 0;
     let subtotal = 0;
+
+    const rowsForQuote = [];
 
     Array.from(windowsTbody.children).forEach((tr) => {
       const [
@@ -152,10 +250,13 @@ document.addEventListener("DOMContentLoaded", () => {
         rowCostTd
       ] = tr.children;
 
+      const labelInput = labelTd.querySelector("input");
       const qtyInput = qtyTd.querySelector("input");
       const widthInput = widthTd.querySelector("input");
       const heightInput = heightTd.querySelector("input");
       const priceInput = priceTd.querySelector("input");
+
+      const label = (labelInput.value || "").trim() || "Window";
 
       const qty = Math.max(0, parseNumber(qtyInput.value));
       const widthIn = Math.max(0, parseNumber(widthInput.value));
@@ -180,6 +281,17 @@ document.addEventListener("DOMContentLoaded", () => {
       perSqFtTd.textContent = numberFmt.format(sqFtPerWindow || 0);
       rowSqFtTd.textContent = numberFmt.format(rowSqFt || 0);
       rowCostTd.textContent = currencyFmt.format(rowCost || 0);
+
+      rowsForQuote.push({
+        label,
+        qty,
+        widthIn,
+        heightIn,
+        sqFtPerWindow,
+        rowSqFt,
+        pricePerSqFt: rowPricePerSqFt,
+        rowCost
+      });
     });
 
     const taxAmount = subtotal * (taxRate / 100);
@@ -199,6 +311,47 @@ document.addEventListener("DOMContentLoaded", () => {
     const jobNameVal = jobNameInput.value.trim();
     summaryJobName.textContent = jobNameVal || "–";
     summaryJobName.classList.toggle("summary-value-muted", !jobNameVal);
+
+    // Update quote preview mirror
+    updateQuotePreview(rowsForQuote, {
+      totalWindows,
+      totalSqFt,
+      subtotal,
+      taxAmount,
+      grandTotal,
+      avgPricePerSqFt
+    });
+  }
+
+  function initTabs() {
+    tabButtons.forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const tabName = btn.dataset.tab;
+
+        tabButtons.forEach((b) => b.classList.remove("active"));
+        tabPanels.forEach((panel) => panel.classList.remove("active"));
+
+        btn.classList.add("active");
+        const panel = document.getElementById(`tab-${tabName}`);
+        if (panel) panel.classList.add("active");
+      });
+    });
+  }
+
+  function initQuoteMeta() {
+    const now = new Date();
+    const dateStr = now.toLocaleDateString("en-US");
+    const quoteId =
+      "QT-" +
+      now.getFullYear().toString().slice(-2) +
+      String(now.getMonth() + 1).padStart(2, "0") +
+      String(now.getDate()).padStart(2, "0") +
+      "-" +
+      String(now.getHours()).padStart(2, "0") +
+      String(now.getMinutes()).padStart(2, "0");
+
+    quoteDateEl.textContent = dateStr;
+    quoteIdEl.textContent = quoteId;
   }
 
   function initDefaults() {
@@ -208,7 +361,14 @@ document.addEventListener("DOMContentLoaded", () => {
     createWindowRow({ label: "Rear sliders", qty: 1 });
 
     // Hook listeners
-    [jobNameInput, defaultPricePerSqFtInput, taxRateInput].forEach((input) => {
+    [
+      jobNameInput,
+      customerEmailInput,
+      customerPhoneInput,
+      customerAddressInput,
+      defaultPricePerSqFtInput,
+      taxRateInput
+    ].forEach((input) => {
       input.addEventListener("input", recalcAll);
     });
 
@@ -216,6 +376,16 @@ document.addEventListener("DOMContentLoaded", () => {
       createWindowRow();
       recalcAll();
     });
+
+    // Print button
+    if (printQuoteBtn) {
+      printQuoteBtn.addEventListener("click", () => {
+        window.print();
+      });
+    }
+
+    initTabs();
+    initQuoteMeta();
 
     // Initial calc
     recalcAll();
