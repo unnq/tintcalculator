@@ -155,7 +155,7 @@ body {
 .field input {
   border-radius: 10px;
   border: 1px solid rgba(148, 163, 184, 0.35);
-  background: var(--input-bg);
+  background: var(--bg);
   padding: 8px 11px;
   color: var(--text-main);
   font-size: 0.9rem;
@@ -249,7 +249,7 @@ table {
 }
 
 thead {
-  background: radial-gradient(circle at top, rgba(30, 64, 175, 0.5), transparent 70%);
+  background: var(--bg);
 }
 
 th,
@@ -269,18 +269,18 @@ th {
 }
 
 tbody tr:nth-child(even) {
-  background: rgba(15, 23, 42, 0.85);
+  background: var(--bg);
 }
 
 tbody tr:nth-child(odd) {
-  background: rgba(15, 23, 42, 0.7);
+  background: var(--bg);
 }
 
 td input {
   width: 100%;
   border-radius: 8px;
   border: 1px solid rgba(75, 85, 99, 0.7);
-  background: #020617;
+  background: var(--bg);
   padding: 5px 6px;
   color: var(--text-main);
   font-size: 0.8rem;
