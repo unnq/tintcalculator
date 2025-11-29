@@ -81,7 +81,7 @@ body {
   font-size: 0.85rem;
   text-transform: uppercase;
   letter-spacing: 0.07em;
-  color: #e5e7eb;
+  color: var(--bg);
 }
 
 /* Layout grid */
@@ -184,7 +184,7 @@ button {
   border-radius: 999px;
   border: 1px solid rgba(148, 163, 184, 0.4);
   background: var(--accent);
-  color: #e5e7eb;
+  color: var(--bg);
   font-size: 0.82rem;
   display: inline-flex;
   align-items: center;
