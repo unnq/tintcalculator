@@ -235,8 +235,11 @@ button {
 .table-wrapper {
   border-radius: 12px;
   border: 1px solid rgba(31, 41, 55, 0.9);
-  overflow: hidden;
+  overflow: auto;
   background: var(--bg-soft);
+  scrollbar-color: var(--border) transparent;
+  scrollbar-width: thin;
+  scrollbar-gutter: stable;
 }
 
 table {
