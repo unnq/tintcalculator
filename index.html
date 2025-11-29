@@ -34,9 +34,9 @@
 
           <div class="field-row">
             <div class="field">
-              <label for="pricePerSqFt">Price per sq ft ($)</label>
+              <label for="defaultPricePerSqFt">Default price per sq ft ($)</label>
               <input
-                id="pricePerSqFt"
+                id="defaultPricePerSqFt"
                 type="number"
                 min="0"
                 step="0.25"
@@ -57,6 +57,7 @@
 
           <p class="helper-text">
             Dimensions are entered in inches and automatically converted to square feet.
+            Each window row has its own price per sq ft.
           </p>
         </section>
 
@@ -79,6 +80,7 @@
                   <th>Height (in)</th>
                   <th>Sq ft / window</th>
                   <th>Row sq ft</th>
+                  <th>Price per sq ft ($)</th>
                   <th>Row cost</th>
                   <th></th>
                 </tr>
@@ -116,7 +118,7 @@
         </div>
 
         <div class="summary-row">
-          <span>Price per sq ft</span>
+          <span>Avg price per sq ft</span>
           <span id="summaryPricePerSqFt">$0.00</span>
         </div>
 
