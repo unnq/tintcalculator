@@ -608,13 +608,14 @@ document.addEventListener("DOMContentLoaded", () => {
     quoteIdEl.textContent = quoteId;
   }
 
-  function initDefaults() {
+    function initDefaults() {
+    populateFilmAndGlassSelects();    // <-- NEW
+
     // Starter rows
     createWindowRow({ label: "Front windows", qty: 4 });
     createWindowRow({ label: "Living room", qty: 2 });
     createWindowRow({ label: "Rear sliders", qty: 1 });
 
-    // Hook listeners
     [
       jobNameInput,
       customerEmailInput,
@@ -630,6 +631,36 @@ document.addEventListener("DOMContentLoaded", () => {
       createWindowRow();
       recalcAll();
     });
+
+    // Film + glass change handlers
+    filmSelect.addEventListener("change", () => {
+      const film = findFilmById(filmSelect.value);
+      if (film && typeof film.defaultPricePerSqFt === "number") {
+        defaultPricePerSqFtInput.value = film.defaultPricePerSqFt;
+      }
+      updateFilmGlassStatus();
+      recalcAll();
+    });
+
+    glassTypeSelect.addEventListener("change", () => {
+      updateFilmGlassStatus();
+      recalcAll();
+    });
+
+    // Print button
+    if (printQuoteBtn) {
+      printQuoteBtn.addEventListener("click", () => {
+        window.print();
+      });
+    }
+
+    initTabs();
+    initQuoteMeta();
+
+    updateFilmGlassStatus();
+    recalcAll();
+  });
+
 
     // Print button
     if (printQuoteBtn) {
