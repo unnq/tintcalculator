@@ -136,6 +136,12 @@ document.addEventListener("DOMContentLoaded", () => {
   const windowsTbody = document.getElementById("windowsTbody");
   const addWindowBtn = document.getElementById("addWindowBtn");
 
+  const filmSelect = document.getElementById("filmSelect");
+  const glassTypeSelect = document.getElementById("glassTypeSelect");
+  const filmGlassStatus = document.getElementById("filmGlassStatus");
+  const filmGlassStatusText = document.getElementById("filmGlassStatusText");
+
+
   const jobNameInput = document.getElementById("jobName");
   const customerEmailInput = document.getElementById("customerEmail");
   const customerPhoneInput = document.getElementById("customerPhone");
