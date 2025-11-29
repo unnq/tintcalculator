@@ -371,6 +371,106 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
+
+    function findFilmById(id) {
+    return FILMS.find((f) => f.id === id) || null;
+  }
+
+  function findGlassById(id) {
+    return GLASS_TYPES.find((g) => g.id === id) || null;
+  }
+
+  function getCompatibilityStatus(filmId, glassId) {
+    const film = findFilmById(filmId);
+    if (!film || !glassId) return "unknown";
+    if (!film.compatibility) return "unknown";
+    return film.compatibility[glassId] || "unknown";
+  }
+
+  function statusLabelFor(status) {
+    switch (status) {
+      case "safe":
+        return "SAFE – warranted by manufacturer";
+      case "conditional":
+        return "CONDITIONAL – preapproval / special conditions";
+      case "not_warranted":
+        return "NOT WARRANTED – do not install on this glass";
+      default:
+        return "Unknown – check film-to-glass chart";
+    }
+  }
+
+  function updateFilmGlassStatus() {
+    const filmId = filmSelect.value;
+    const glassId = glassTypeSelect.value;
+    const status = getCompatibilityStatus(filmId, glassId);
+
+    filmGlassStatus.classList.remove(
+      "status-safe",
+      "status-conditional",
+      "status-not",
+      "status-unknown"
+    );
+
+    let className;
+    switch (status) {
+      case "safe":
+        className = "status-safe";
+        break;
+      case "conditional":
+        className = "status-conditional";
+        break;
+      case "not_warranted":
+        className = "status-not";
+        break;
+      default:
+        className = "status-unknown";
+        break;
+    }
+
+    filmGlassStatus.classList.add(className);
+    filmGlassStatusText.textContent = statusLabelFor(status);
+  }
+
+  function populateFilmAndGlassSelects() {
+    // Film select with optgroups by category
+    const byCategory = {};
+    FILMS.forEach((film) => {
+      if (!byCategory[film.category]) byCategory[film.category] = [];
+      byCategory[film.category].push(film);
+    });
+
+    Object.entries(byCategory).forEach(([category, films]) => {
+      const group = document.createElement("optgroup");
+      group.label = category;
+      films.forEach((film) => {
+        const opt = document.createElement("option");
+        opt.value = film.id;
+        opt.textContent = film.name;
+        group.appendChild(opt);
+      });
+      filmSelect.appendChild(group);
+    });
+
+    // Glass types
+    GLASS_TYPES.forEach((glass) => {
+      const opt = document.createElement("option");
+      opt.value = glass.id;
+      opt.textContent = glass.label;
+      glassTypeSelect.appendChild(opt);
+    });
+
+    // Default selections
+    if (filmSelect.options.length > 0) {
+      filmSelect.selectedIndex = 0;
+    }
+    if (glassTypeSelect.options.length > 0) {
+      glassTypeSelect.selectedIndex = 0;
+    }
+  }
+
+  
+  
   function recalcAll() {
     const taxRate = parseNumber(taxRateInput.value);
 
