@@ -315,6 +315,18 @@ document.addEventListener("DOMContentLoaded", () => {
     const phoneVal = customerPhoneInput.value.trim();
     const addressVal = customerAddressInput.value.trim();
 
+        // Film / glass / compat into quote box
+    const filmId = filmSelect.value;
+    const glassId = glassTypeSelect.value;
+    const film = findFilmById(filmId);
+    const glass = findGlassById(glassId);
+    const status = getCompatibilityStatus(filmId, glassId);
+
+    quoteFilmEl.textContent = film ? film.name : "–";
+    quoteGlassTypeEl.textContent = glass ? glass.label : "–";
+    quoteCompatEl.textContent = statusLabelFor(status);
+
+
     quoteJobName.textContent = jobNameVal || "Window tint installation";
     quoteCustomerEmail.textContent = emailVal || "–";
     quoteCustomerPhone.textContent = phoneVal || "–";
