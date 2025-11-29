@@ -64,7 +64,16 @@ const FILMS = [
   },
 
   // CLEAR VIEW
-  { id: "clear_view_plus_70_ps", name: "Clear View Plus 70% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {} },
+  { id: "clear_view_plus_70_ps", name: "Clear View Plus 70% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {
+      single_pane_clear: "safe",
+      single_pane_tinted: "safe",
+      single_dual_pane_laminated: "not_warranted",
+      dual_pane_clear: "safe",
+      dual_pane_tinted: "safe",
+      dual_pane_low_e_surface_2: "conditional",
+      dual_pane_low_e_surface_3: "not_warranted",
+      triple_pane_clear: "safe",
+      tempered_heat_strengthened: "safe"} },
   { id: "clear_view_plus_55_ps", name: "Clear View Plus 55% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {} },
   { id: "clear_view_plus_40_ps", name: "Clear View Plus 40% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {} },
   { id: "clear_view_plus_20_ps", name: "Clear View Plus 20% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {} },
