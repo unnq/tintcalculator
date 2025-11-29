@@ -30,7 +30,7 @@ body {
   min-height: 100%;
   font-family: system-ui, -apple-system, BlinkMacSystemFont, "SF Pro Text",
     "Segoe UI", sans-serif;
-  background: radial-gradient(circle at top, #020617 0, #020617 35%, #020617 60%, #020617 100%);
+  background: var(--bg);
   color: var(--text-main);
 }
 
@@ -96,8 +96,7 @@ body {
 /* Panels */
 
 .panel {
-  background: radial-gradient(circle at top left, rgba(31, 41, 55, 0.7), transparent 65%),
-    var(--bg-elevated);
+  background: var(--bg-elevated);
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
   padding: 14px 14px 12px;
