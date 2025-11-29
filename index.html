@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Window Tint Estimate Calculator</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div>
+        <h1>Window Tint Estimate</h1>
+        <p>Quickly calculate total square footage and pricing for tint jobs.</p>
+      </div>
+      <div class="brand-tag">
+        <span>Tint Co.</span>
+      </div>
+    </header>
+
+    <main class="layout">
+      <!-- LEFT COLUMN -->
+      <section class="left-column">
+        <!-- Job & Pricing Panel -->
+        <section class="panel">
+          <h2>Job & Pricing</h2>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="jobName">Job name / reference</label>
+              <input id="jobName" type="text" placeholder="e.g. Smith Residence – Front Windows" />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="pricePerSqFt">Price per sq ft ($)</label>
+              <input
+                id="pricePerSqFt"
+                type="number"
+                min="0"
+                step="0.25"
+                value="12"
+              />
+            </div>
+            <div class="field">
+              <label for="taxRate">Tax rate (%)</label>
+              <input
+                id="taxRate"
+                type="number"
+                min="0"
+                step="0.01"
+                value="8.75"
+              />
+            </div>
+          </div>
+
+          <p class="helper-text">
+            Dimensions are entered in inches and automatically converted to square feet.
+          </p>
+        </section>
+
+        <!-- Windows Table Panel -->
+        <section class="panel">
+          <div class="panel-header">
+            <h2>Windows</h2>
+            <button id="addWindowBtn" type="button" class="btn-secondary">
+              + Add window
+            </button>
+          </div>
+
+          <div class="table-wrapper">
+            <table id="windowsTable">
+              <thead>
+                <tr>
+                  <th>Label</th>
+                  <th>Qty</th>
+                  <th>Width (in)</th>
+                  <th>Height (in)</th>
+                  <th>Sq ft / window</th>
+                  <th>Row sq ft</th>
+                  <th>Row cost</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody id="windowsTbody">
+                <!-- Rows injected by JS -->
+              </tbody>
+            </table>
+          </div>
+
+          <p class="helper-text">
+            Example labels: “Living room left”, “Front door side lite”, “Rear sliders”.
+          </p>
+        </section>
+      </section>
+
+      <!-- RIGHT COLUMN: SUMMARY -->
+      <aside class="summary panel">
+        <h2>Estimate Summary</h2>
+
+        <div class="summary-row">
+          <span>Job name</span>
+          <span id="summaryJobName" class="summary-value-muted">–</span>
+        </div>
+
+        <hr />
+
+        <div class="summary-row">
+          <span>Total windows</span>
+          <span id="totalWindows">0</span>
+        </div>
+        <div class="summary-row">
+          <span>Total square footage</span>
+          <span id="totalSqFt">0.00 sq ft</span>
+        </div>
+
+        <div class="summary-row">
+          <span>Price per sq ft</span>
+          <span id="summaryPricePerSqFt">$0.00</span>
+        </div>
+
+        <hr />
+
+        <div class="summary-row">
+          <span>Material subtotal</span>
+          <span id="subtotal">$0.00</span>
+        </div>
+        <div class="summary-row">
+          <span>Tax</span>
+          <span id="taxAmount">$0.00</span>
+        </div>
+
+        <div class="summary-row summary-total">
+          <span>Estimated total</span>
+          <span id="grandTotal">$0.00</span>
+        </div>
+
+        <p class="fine-print">
+          This is a rough estimate only. Final pricing may vary based on on-site measurements,
+          film type, and additional labor or travel.
+        </p>
+      </aside>
+    </main>
+
+    <footer class="app-footer">
+      <span>Window Tint Estimate Calculator</span>
+      <span class="dot">•</span>
+      <span>Built for demo use</span>
+    </footer>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
