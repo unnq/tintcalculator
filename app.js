@@ -1,4 +1,4 @@
-// app.js - Window Tint Estimate + Quote
+e// app.js - Window Tint Estimate + Quote
 
 // ---- Film-to-glass data ------------------------------------
 
@@ -67,15 +67,36 @@ const FILMS = [
   { id: "clear_view_plus_70_ps", name: "Clear View Plus 70% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {
       single_pane_clear: "safe",
       single_pane_tinted: "safe",
-      single_dual_pane_laminated: "not_warranted",
+      single_dual_pane_laminated: "safe",
       dual_pane_clear: "safe",
       dual_pane_tinted: "safe",
-      dual_pane_low_e_surface_2: "conditional",
-      dual_pane_low_e_surface_3: "not_warranted",
+      dual_pane_low_e_surface_2: "safe",
+      dual_pane_low_e_surface_3: "safe",
       triple_pane_clear: "safe",
-      tempered_heat_strengthened: "safe"} },
-  { id: "clear_view_plus_55_ps", name: "Clear View Plus 55% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {} },
-  { id: "clear_view_plus_40_ps", name: "Clear View Plus 40% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {} },
+      tempered_heat_strengthened: "safe"
+  } },
+  { id: "clear_view_plus_55_ps", name: "Clear View Plus 55% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {
+      single_pane_clear: "safe",
+      single_pane_tinted: "safe",
+      single_dual_pane_laminated: "safe",
+      dual_pane_clear: "safe",
+      dual_pane_tinted: "safe",
+      dual_pane_low_e_surface_2: "safe",
+      dual_pane_low_e_surface_3: "safe",
+      triple_pane_clear: "conditional",
+      tempered_heat_strengthened: "safe"
+  } },
+  { id: "clear_view_plus_40_ps", name: "Clear View Plus 40% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {
+      single_pane_clear: "safe",
+      single_pane_tinted: "safe",
+      single_dual_pane_laminated: "not warranted",
+      dual_pane_clear: "safe",
+      dual_pane_tinted: "safe",
+      dual_pane_low_e_surface_2: "safe",
+      dual_pane_low_e_surface_3: "safe",
+      triple_pane_clear: "not warranted",
+      tempered_heat_strengthened: "safe"
+  } },
   { id: "clear_view_plus_20_ps", name: "Clear View Plus 20% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {} },
   { id: "clear_view_alloy_65_ps", name: "Clear View Alloy 65 PS", category: "Clear View", defaultPricePerSqFt: 14, compatibility: {} },
   { id: "clear_view_alloy_50_ps", name: "Clear View Alloy 50 PS", category: "Clear View", defaultPricePerSqFt: 14, compatibility: {} },
