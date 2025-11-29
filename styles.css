@@ -88,7 +88,7 @@ body {
 
 .layout {
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1.1fr);
+  grid-template-columns: minmax(0, 2fr) minmax(0, .75fr);
   gap: 16px;
   align-items: flex-start;
 }
