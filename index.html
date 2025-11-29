@@ -11,161 +11,248 @@
     <header class="app-header">
       <div>
         <h1>Window Tint Estimate</h1>
-        <p>Quickly calculate total square footage and pricing for tint jobs.</p>
+        <p>Estimate and generate a customer-facing quote for tint jobs.</p>
       </div>
       <div class="brand-tag">
-        <span>Tintworld</span>
+        <span>Tint Co.</span>
       </div>
     </header>
 
-    <main class="layout">
-      <!-- LEFT COLUMN -->
-      <section class="left-column">
-        <!-- Job & Pricing Panel -->
-<section class="panel">
-  <h2>Job & Pricing</h2>
-
-  <div class="field-row">
-    <div class="field">
-      <label for="jobName">Job name / reference</label>
-      <input id="jobName" type="text" placeholder="e.g. Smith Residence – Front Windows" />
+    <!-- TABS -->
+    <div class="tabs">
+      <button class="tab-btn active" data-tab="estimate">Estimate</button>
+      <button class="tab-btn" data-tab="quote">Quote</button>
     </div>
-  </div>
 
-  <div class="field-row">
-    <div class="field">
-      <label for="customerEmail">Customer email</label>
-      <input id="customerEmail" type="email" placeholder="customer@example.com" />
+    <!-- TAB 1: ESTIMATE -->
+    <div id="tab-estimate" class="tab-panel active">
+      <main class="layout">
+        <!-- LEFT COLUMN -->
+        <section class="left-column">
+          <!-- Job & Pricing Panel -->
+          <section class="panel">
+            <h2>Job & Pricing</h2>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="jobName">Job name / reference</label>
+                <input id="jobName" type="text" placeholder="e.g. Smith Residence – Front Windows" />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="customerEmail">Customer email</label>
+                <input id="customerEmail" type="email" placeholder="customer@example.com" />
+              </div>
+              <div class="field">
+                <label for="customerPhone">Customer phone</label>
+                <input id="customerPhone" type="tel" placeholder="(555) 555-5555" />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="customerAddress">Customer address</label>
+                <input id="customerAddress" type="text" placeholder="123 Main St, City, CA 90000" />
+              </div>
+            </div>
+
+            <div class="field-row">
+              <div class="field">
+                <label for="defaultPricePerSqFt">Default price per sq ft ($)</label>
+                <input
+                  id="defaultPricePerSqFt"
+                  type="number"
+                  min="0"
+                  step="0.25"
+                  value="12"
+                />
+              </div>
+              <div class="field">
+                <label for="taxRate">Tax rate (%)</label>
+                <input
+                  id="taxRate"
+                  type="number"
+                  min="0"
+                  step="0.01"
+                  value="8.75"
+                />
+              </div>
+            </div>
+
+            <p class="helper-text">
+              Dimensions are entered in inches and automatically converted to square feet.
+              Each window row has its own price per sq ft.
+            </p>
+          </section>
+
+          <!-- Windows Table Panel -->
+          <section class="panel">
+            <div class="panel-header">
+              <h2>Windows</h2>
+              <button id="addWindowBtn" type="button" class="btn-secondary">
+                + Add window
+              </button>
+            </div>
+
+            <div class="table-wrapper">
+              <table id="windowsTable">
+                <thead>
+                  <tr>
+                    <th>Label</th>
+                    <th>Qty</th>
+                    <th>Width (in)</th>
+                    <th>Height (in)</th>
+                    <th>Sq ft / window</th>
+                    <th>Row sq ft</th>
+                    <th>Price per sq ft ($)</th>
+                    <th>Row cost</th>
+                    <th></th>
+                  </tr>
+                </thead>
+                <tbody id="windowsTbody">
+                  <!-- Rows injected by JS -->
+                </tbody>
+              </table>
+            </div>
+
+            <p class="helper-text">
+              Example labels: “Living room left”, “Front door side lite”, “Rear sliders”.
+            </p>
+          </section>
+        </section>
+
+        <!-- RIGHT COLUMN: SUMMARY -->
+        <aside class="summary panel">
+          <h2>Estimate Summary</h2>
+
+          <div class="summary-row">
+            <span>Job name</span>
+            <span id="summaryJobName" class="summary-value-muted">–</span>
+          </div>
+
+          <hr />
+
+          <div class="summary-row">
+            <span>Total windows</span>
+            <span id="totalWindows">0</span>
+          </div>
+          <div class="summary-row">
+            <span>Total square footage</span>
+            <span id="totalSqFt">0.00 sq ft</span>
+          </div>
+
+          <div class="summary-row">
+            <span>Avg price per sq ft</span>
+            <span id="summaryPricePerSqFt">$0.00</span>
+          </div>
+
+          <hr />
+
+          <div class="summary-row">
+            <span>Material subtotal</span>
+            <span id="subtotal">$0.00</span>
+          </div>
+          <div class="summary-row">
+            <span>Tax</span>
+            <span id="taxAmount">$0.00</span>
+          </div>
+
+          <div class="summary-row summary-total">
+            <span>Estimated total</span>
+            <span id="grandTotal">$0.00</span>
+          </div>
+
+          <p class="fine-print">
+            This is a rough estimate only. Final pricing may vary based on on-site measurements,
+            film type, and additional labor or travel.
+          </p>
+        </aside>
+      </main>
     </div>
-    <div class="field">
-      <label for="customerPhone">Customer phone</label>
-      <input id="customerPhone" type="tel" placeholder="(555) 555-5555" />
-    </div>
-  </div>
 
-  <div class="field-row">
-    <div class="field">
-      <label for="customerAddress">Customer address</label>
-      <input id="customerAddress" type="text" placeholder="123 Main St, City, CA 90000" />
-    </div>
-  </div>
-
-  <div class="field-row">
-    <div class="field">
-      <label for="defaultPricePerSqFt">Default price per sq ft ($)</label>
-      <input
-        id="defaultPricePerSqFt"
-        type="number"
-        min="0"
-        step="0.25"
-        value="12"
-      />
-    </div>
-    <div class="field">
-      <label for="taxRate">Tax rate (%)</label>
-      <input
-        id="taxRate"
-        type="number"
-        min="0"
-        step="0.01"
-        value="8.75"
-      />
-    </div>
-  </div>
-
-  <p class="helper-text">
-    Dimensions are entered in inches and automatically converted to square feet.
-    Each window row has its own price per sq ft.
-  </p>
-</section>
-
-
-        <!-- Windows Table Panel -->
-        <section class="panel">
-          <div class="panel-header">
-            <h2>Windows</h2>
-            <button id="addWindowBtn" type="button" class="btn-secondary">
-              + Add window
+    <!-- TAB 2: QUOTE (CUSTOMER FACING) -->
+    <div id="tab-quote" class="tab-panel">
+      <section class="panel quote-panel" id="quotePanel">
+        <div class="quote-header">
+          <div>
+            <h2>Window Tint Quote</h2>
+            <p class="quote-subtitle">Prepared by Tint Co.</p>
+          </div>
+          <div class="quote-header-right">
+            <button id="printQuoteBtn" type="button" class="btn-secondary">
+              🖨 Print / Save as PDF
             </button>
           </div>
+        </div>
 
-          <div class="table-wrapper">
-            <table id="windowsTable">
-              <thead>
-                <tr>
-                  <th>Label</th>
-                  <th>Qty</th>
-                  <th>Width (in)</th>
-                  <th>Height (in)</th>
-                  <th>Sq ft / window</th>
-                  <th>Row sq ft</th>
-                  <th>Price per sq ft ($)</th>
-                  <th>Row cost</th>
-                  <th></th>
-                </tr>
-              </thead>
-              <tbody id="windowsTbody">
-                <!-- Rows injected by JS -->
-              </tbody>
-            </table>
+        <div class="quote-columns">
+          <div class="quote-box">
+            <h3 class="quote-box-title">Customer</h3>
+            <p><strong id="quoteJobName">–</strong></p>
+            <p id="quoteCustomerAddress">–</p>
+            <p id="quoteCustomerPhone">–</p>
+            <p id="quoteCustomerEmail">–</p>
           </div>
 
-          <p class="helper-text">
-            Example labels: “Living room left”, “Front door side lite”, “Rear sliders”.
-          </p>
-        </section>
-      </section>
-
-      <!-- RIGHT COLUMN: SUMMARY -->
-      <aside class="summary panel">
-        <h2>Estimate Summary</h2>
-
-        <div class="summary-row">
-          <span>Job name</span>
-          <span id="summaryJobName" class="summary-value-muted">–</span>
+          <div class="quote-box">
+            <h3 class="quote-box-title">Quote Info</h3>
+            <p><span class="quote-label">Quote #:</span> <span id="quoteId">–</span></p>
+            <p><span class="quote-label">Date:</span> <span id="quoteDate">–</span></p>
+            <p><span class="quote-label">Total sq ft:</span> <span id="quoteTotalSqFt">0.00 sq ft</span></p>
+            <p><span class="quote-label">Total windows:</span> <span id="quoteTotalWindows">0</span></p>
+          </div>
         </div>
 
-        <hr />
-
-        <div class="summary-row">
-          <span>Total windows</span>
-          <span id="totalWindows">0</span>
-        </div>
-        <div class="summary-row">
-          <span>Total square footage</span>
-          <span id="totalSqFt">0.00 sq ft</span>
-        </div>
-
-        <div class="summary-row">
-          <span>Avg price per sq ft</span>
-          <span id="summaryPricePerSqFt">$0.00</span>
-        </div>
-
-        <hr />
-
-        <div class="summary-row">
-          <span>Material subtotal</span>
-          <span id="subtotal">$0.00</span>
-        </div>
-        <div class="summary-row">
-          <span>Tax</span>
-          <span id="taxAmount">$0.00</span>
+        <h3 class="quote-section-title">Tinting Details</h3>
+        <div class="quote-table-wrapper">
+          <table class="quote-table">
+            <thead>
+              <tr>
+                <th>Label</th>
+                <th>Qty</th>
+                <th>Size (in)</th>
+                <th>Row sq ft</th>
+                <th>Price / sq ft</th>
+                <th>Line total</th>
+              </tr>
+            </thead>
+            <tbody id="quoteTbody">
+              <!-- Filled from estimate -->
+            </tbody>
+          </table>
         </div>
 
-        <div class="summary-row summary-total">
-          <span>Estimated total</span>
-          <span id="grandTotal">$0.00</span>
+        <div class="quote-totals">
+          <div class="quote-totals-row">
+            <span>Subtotal</span>
+            <span id="quoteSubtotal">$0.00</span>
+          </div>
+          <div class="quote-totals-row">
+            <span>Tax</span>
+            <span id="quoteTax">$0.00</span>
+          </div>
+          <div class="quote-totals-row quote-totals-grand">
+            <span>Total</span>
+            <span id="quoteGrandTotal">$0.00</span>
+          </div>
+          <div class="quote-totals-row quote-totals-muted">
+            <span>Average price per sq ft</span>
+            <span id="quoteAvgPrice">$0.00</span>
+          </div>
         </div>
 
         <p class="fine-print">
-          This is a rough estimate only. Final pricing may vary based on on-site measurements,
-          film type, and additional labor or travel.
+          This quote is based on the measurements and information provided. Final price may be
+          adjusted after on-site verification and film selection. Thank you for the opportunity
+          to earn your business.
         </p>
-      </aside>
-    </main>
+      </section>
+    </div>
 
     <footer class="app-footer">
-      <span>Window Tint Estimate Calculator</span>
+      <span>Window Tint Estimate &amp; Quote</span>
       <span class="dot">•</span>
       <span>Built for demo use</span>
     </footer>
