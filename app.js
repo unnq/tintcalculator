@@ -1,11 +1,11 @@
-// app.js - Window Tint Estimate Calculator
+// app.js - Window Tint Estimate Calculator (row-level price per sq ft)
 
 document.addEventListener("DOMContentLoaded", () => {
   const windowsTbody = document.getElementById("windowsTbody");
   const addWindowBtn = document.getElementById("addWindowBtn");
 
   const jobNameInput = document.getElementById("jobName");
-  const pricePerSqFtInput = document.getElementById("pricePerSqFt");
+  const defaultPricePerSqFtInput = document.getElementById("defaultPricePerSqFt");
   const taxRateInput = document.getElementById("taxRate");
 
   const summaryJobName = document.getElementById("summaryJobName");
@@ -48,6 +48,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const heightTd = document.createElement("td");
     const perSqFtTd = document.createElement("td");
     const rowSqFtTd = document.createElement("td");
+    const priceTd = document.createElement("td");
     const rowCostTd = document.createElement("td");
     const actionsTd = document.createElement("td");
 
@@ -75,6 +76,15 @@ document.addEventListener("DOMContentLoaded", () => {
     heightInput.step = "0.01";
     heightInput.value = preset.heightIn != null ? preset.heightIn : "";
 
+    const priceInput = document.createElement("input");
+    priceInput.type = "number";
+    priceInput.min = "0";
+    priceInput.step = "0.25";
+    priceInput.value =
+      preset.pricePerSqFt != null
+        ? preset.pricePerSqFt
+        : defaultPricePerSqFtInput.value || "0";
+
     // Numeric display cells
     perSqFtTd.classList.add("numeric-cell");
     rowSqFtTd.classList.add("numeric-cell");
@@ -96,6 +106,7 @@ document.addEventListener("DOMContentLoaded", () => {
     qtyTd.appendChild(qtyInput);
     widthTd.appendChild(widthInput);
     heightTd.appendChild(heightInput);
+    priceTd.appendChild(priceInput);
 
     tr.appendChild(labelTd);
     tr.appendChild(qtyTd);
@@ -103,11 +114,12 @@ document.addEventListener("DOMContentLoaded", () => {
     tr.appendChild(heightTd);
     tr.appendChild(perSqFtTd);
     tr.appendChild(rowSqFtTd);
+    tr.appendChild(priceTd);
     tr.appendChild(rowCostTd);
     tr.appendChild(actionsTd);
 
     // Listeners
-    [labelInput, qtyInput, widthInput, heightInput].forEach((input) => {
+    [labelInput, qtyInput, widthInput, heightInput, priceInput].forEach((input) => {
       input.addEventListener("input", recalcAll);
     });
 
@@ -122,7 +134,6 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function recalcAll() {
-    const pricePerSqFt = parseNumber(pricePerSqFtInput.value);
     const taxRate = parseNumber(taxRateInput.value);
 
     let totalWindows = 0;
@@ -130,16 +141,26 @@ document.addEventListener("DOMContentLoaded", () => {
     let subtotal = 0;
 
     Array.from(windowsTbody.children).forEach((tr) => {
-      const [labelTd, qtyTd, widthTd, heightTd, perSqFtTd, rowSqFtTd, rowCostTd] =
-        tr.children;
+      const [
+        labelTd,
+        qtyTd,
+        widthTd,
+        heightTd,
+        perSqFtTd,
+        rowSqFtTd,
+        priceTd,
+        rowCostTd
+      ] = tr.children;
 
       const qtyInput = qtyTd.querySelector("input");
       const widthInput = widthTd.querySelector("input");
       const heightInput = heightTd.querySelector("input");
+      const priceInput = priceTd.querySelector("input");
 
       const qty = Math.max(0, parseNumber(qtyInput.value));
       const widthIn = Math.max(0, parseNumber(widthInput.value));
       const heightIn = Math.max(0, parseNumber(heightInput.value));
+      const rowPricePerSqFt = Math.max(0, parseNumber(priceInput.value));
 
       // Convert inches to feet
       const widthFt = widthIn / 12;
@@ -147,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
       const sqFtPerWindow = widthFt * heightFt;
       const rowSqFt = sqFtPerWindow * qty;
-      const rowCost = rowSqFt * pricePerSqFt;
+      const rowCost = rowSqFt * rowPricePerSqFt;
 
       if (qty > 0 && sqFtPerWindow > 0) {
         totalWindows += qty;
@@ -171,7 +192,9 @@ document.addEventListener("DOMContentLoaded", () => {
     taxAmountEl.textContent = currencyFmt.format(taxAmount);
     grandTotalEl.textContent = currencyFmt.format(grandTotal);
 
-    summaryPricePerSqFt.textContent = currencyFmt.format(pricePerSqFt || 0);
+    const avgPricePerSqFt =
+      totalSqFt > 0 ? subtotal / totalSqFt : 0;
+    summaryPricePerSqFt.textContent = currencyFmt.format(avgPricePerSqFt || 0);
 
     const jobNameVal = jobNameInput.value.trim();
     summaryJobName.textContent = jobNameVal || "–";
@@ -179,13 +202,13 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function initDefaults() {
-    // Starter rows similar to how we pre-populate in the Xmas calc
+    // Starter rows
     createWindowRow({ label: "Front windows", qty: 4 });
     createWindowRow({ label: "Living room", qty: 2 });
     createWindowRow({ label: "Rear sliders", qty: 1 });
 
     // Hook listeners
-    [jobNameInput, pricePerSqFtInput, taxRateInput].forEach((input) => {
+    [jobNameInput, defaultPricePerSqFtInput, taxRateInput].forEach((input) => {
       input.addEventListener("input", recalcAll);
     });
 
