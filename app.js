@@ -1,4 +1,4 @@
-e// app.js - Window Tint Estimate + Quote
+// app.js - Window Tint Estimate + Quote
 
 // ---- Film-to-glass data ------------------------------------
 
