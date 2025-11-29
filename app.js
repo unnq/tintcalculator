@@ -41,8 +41,8 @@ const GLASS_TYPES = [
   }
 ];
 
-// NOTE: For now compatibility objects are mostly empty. You’ll fill these from
-// the XPEL chart: use "safe", "conditional", or "not_warranted" per glass type.
+// NOTE: For now compatibility objects are mostly empty. Fill from the XPEL chart:
+// "safe", "conditional", or "not_warranted" per glass type.
 const FILMS = [
   // SPECIALTY SERIES
   {
@@ -51,7 +51,6 @@ const FILMS = [
     category: "Specialty Series",
     defaultPricePerSqFt: 14,
     compatibility: {
-      // Example of how to encode (replace with your real chart values):
       // single_pane_clear: "safe",
       // dual_pane_low_e_surface_3: "conditional",
     }
@@ -129,9 +128,6 @@ const FILMS = [
   { id: "dusted_crystal", name: "Dusted Crystal", category: "Decorative", defaultPricePerSqFt: 15, compatibility: {} }
 ];
 
-
-
-
 document.addEventListener("DOMContentLoaded", () => {
   const windowsTbody = document.getElementById("windowsTbody");
   const addWindowBtn = document.getElementById("addWindowBtn");
@@ -140,7 +136,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const glassTypeSelect = document.getElementById("glassTypeSelect");
   const filmGlassStatus = document.getElementById("filmGlassStatus");
   const filmGlassStatusText = document.getElementById("filmGlassStatusText");
-
 
   const jobNameInput = document.getElementById("jobName");
   const customerEmailInput = document.getElementById("customerEmail");
@@ -175,7 +170,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const quoteFilmEl = document.getElementById("quoteFilm");
   const quoteGlassTypeEl = document.getElementById("quoteGlassType");
   const quoteCompatEl = document.getElementById("quoteCompat");
-
 
   const printQuoteBtn = document.getElementById("printQuoteBtn");
 
@@ -315,7 +309,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const phoneVal = customerPhoneInput.value.trim();
     const addressVal = customerAddressInput.value.trim();
 
-        // Film / glass / compat into quote box
+    // Film / glass / compat into quote box
     const filmId = filmSelect.value;
     const glassId = glassTypeSelect.value;
     const film = findFilmById(filmId);
@@ -325,7 +319,6 @@ document.addEventListener("DOMContentLoaded", () => {
     quoteFilmEl.textContent = film ? film.name : "–";
     quoteGlassTypeEl.textContent = glass ? glass.label : "–";
     quoteCompatEl.textContent = statusLabelFor(status);
-
 
     quoteJobName.textContent = jobNameVal || "Window tint installation";
     quoteCustomerEmail.textContent = emailVal || "–";
@@ -383,8 +376,7 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-
-    function findFilmById(id) {
+  function findFilmById(id) {
     return FILMS.find((f) => f.id === id) || null;
   }
 
@@ -392,289 +384,4 @@ document.addEventListener("DOMContentLoaded", () => {
     return GLASS_TYPES.find((g) => g.id === id) || null;
   }
 
-  function getCompatibilityStatus(filmId, glassId) {
-    const film = findFilmById(filmId);
-    if (!film || !glassId) return "unknown";
-    if (!film.compatibility) return "unknown";
-    return film.compatibility[glassId] || "unknown";
-  }
-
-  function statusLabelFor(status) {
-    switch (status) {
-      case "safe":
-        return "SAFE – warranted by manufacturer";
-      case "conditional":
-        return "CONDITIONAL – preapproval / special conditions";
-      case "not_warranted":
-        return "NOT WARRANTED – do not install on this glass";
-      default:
-        return "Unknown – check film-to-glass chart";
-    }
-  }
-
-  function updateFilmGlassStatus() {
-    const filmId = filmSelect.value;
-    const glassId = glassTypeSelect.value;
-    const status = getCompatibilityStatus(filmId, glassId);
-
-    filmGlassStatus.classList.remove(
-      "status-safe",
-      "status-conditional",
-      "status-not",
-      "status-unknown"
-    );
-
-    let className;
-    switch (status) {
-      case "safe":
-        className = "status-safe";
-        break;
-      case "conditional":
-        className = "status-conditional";
-        break;
-      case "not_warranted":
-        className = "status-not";
-        break;
-      default:
-        className = "status-unknown";
-        break;
-    }
-
-    filmGlassStatus.classList.add(className);
-    filmGlassStatusText.textContent = statusLabelFor(status);
-  }
-
-  function populateFilmAndGlassSelects() {
-    // Film select with optgroups by category
-    const byCategory = {};
-    FILMS.forEach((film) => {
-      if (!byCategory[film.category]) byCategory[film.category] = [];
-      byCategory[film.category].push(film);
-    });
-
-    Object.entries(byCategory).forEach(([category, films]) => {
-      const group = document.createElement("optgroup");
-      group.label = category;
-      films.forEach((film) => {
-        const opt = document.createElement("option");
-        opt.value = film.id;
-        opt.textContent = film.name;
-        group.appendChild(opt);
-      });
-      filmSelect.appendChild(group);
-    });
-
-    // Glass types
-    GLASS_TYPES.forEach((glass) => {
-      const opt = document.createElement("option");
-      opt.value = glass.id;
-      opt.textContent = glass.label;
-      glassTypeSelect.appendChild(opt);
-    });
-
-    // Default selections
-    if (filmSelect.options.length > 0) {
-      filmSelect.selectedIndex = 0;
-    }
-    if (glassTypeSelect.options.length > 0) {
-      glassTypeSelect.selectedIndex = 0;
-    }
-  }
-
-  
-  
-  function recalcAll() {
-    const taxRate = parseNumber(taxRateInput.value);
-
-    let totalWindows = 0;
-    let totalSqFt = 0;
-    let subtotal = 0;
-
-    const rowsForQuote = [];
-
-    Array.from(windowsTbody.children).forEach((tr) => {
-      const [
-        labelTd,
-        qtyTd,
-        widthTd,
-        heightTd,
-        perSqFtTd,
-        rowSqFtTd,
-        priceTd,
-        rowCostTd
-      ] = tr.children;
-
-      const labelInput = labelTd.querySelector("input");
-      const qtyInput = qtyTd.querySelector("input");
-      const widthInput = widthTd.querySelector("input");
-      const heightInput = heightTd.querySelector("input");
-      const priceInput = priceTd.querySelector("input");
-
-      const label = (labelInput.value || "").trim() || "Window";
-
-      const qty = Math.max(0, parseNumber(qtyInput.value));
-      const widthIn = Math.max(0, parseNumber(widthInput.value));
-      const heightIn = Math.max(0, parseNumber(heightInput.value));
-      const rowPricePerSqFt = Math.max(0, parseNumber(priceInput.value));
-
-      // Convert inches to feet
-      const widthFt = widthIn / 12;
-      const heightFt = heightIn / 12;
-
-      const sqFtPerWindow = widthFt * heightFt;
-      const rowSqFt = sqFtPerWindow * qty;
-      const rowCost = rowSqFt * rowPricePerSqFt;
-
-      if (qty > 0 && sqFtPerWindow > 0) {
-        totalWindows += qty;
-      }
-
-      totalSqFt += rowSqFt;
-      subtotal += rowCost;
-
-      perSqFtTd.textContent = numberFmt.format(sqFtPerWindow || 0);
-      rowSqFtTd.textContent = numberFmt.format(rowSqFt || 0);
-      rowCostTd.textContent = currencyFmt.format(rowCost || 0);
-
-      rowsForQuote.push({
-        label,
-        qty,
-        widthIn,
-        heightIn,
-        sqFtPerWindow,
-        rowSqFt,
-        pricePerSqFt: rowPricePerSqFt,
-        rowCost
-      });
-    });
-
-    const taxAmount = subtotal * (taxRate / 100);
-    const grandTotal = subtotal + taxAmount;
-
-    // Summary UI
-    totalWindowsEl.textContent = totalWindows;
-    totalSqFtEl.textContent = `${numberFmt.format(totalSqFt)} sq ft`;
-    subtotalEl.textContent = currencyFmt.format(subtotal);
-    taxAmountEl.textContent = currencyFmt.format(taxAmount);
-    grandTotalEl.textContent = currencyFmt.format(grandTotal);
-
-    const avgPricePerSqFt =
-      totalSqFt > 0 ? subtotal / totalSqFt : 0;
-    summaryPricePerSqFt.textContent = currencyFmt.format(avgPricePerSqFt || 0);
-
-    const jobNameVal = jobNameInput.value.trim();
-    summaryJobName.textContent = jobNameVal || "–";
-    summaryJobName.classList.toggle("summary-value-muted", !jobNameVal);
-
-    // Update quote preview mirror
-    updateQuotePreview(rowsForQuote, {
-      totalWindows,
-      totalSqFt,
-      subtotal,
-      taxAmount,
-      grandTotal,
-      avgPricePerSqFt
-    });
-  }
-
-  function initTabs() {
-    tabButtons.forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const tabName = btn.dataset.tab;
-
-        tabButtons.forEach((b) => b.classList.remove("active"));
-        tabPanels.forEach((panel) => panel.classList.remove("active"));
-
-        btn.classList.add("active");
-        const panel = document.getElementById(`tab-${tabName}`);
-        if (panel) panel.classList.add("active");
-      });
-    });
-  }
-
-  function initQuoteMeta() {
-    const now = new Date();
-    const dateStr = now.toLocaleDateString("en-US");
-    const quoteId =
-      "QT-" +
-      now.getFullYear().toString().slice(-2) +
-      String(now.getMonth() + 1).padStart(2, "0") +
-      String(now.getDate()).padStart(2, "0") +
-      "-" +
-      String(now.getHours()).padStart(2, "0") +
-      String(now.getMinutes()).padStart(2, "0");
-
-    quoteDateEl.textContent = dateStr;
-    quoteIdEl.textContent = quoteId;
-  }
-
-    function initDefaults() {
-    populateFilmAndGlassSelects();    // <-- NEW
-
-    // Starter rows
-    createWindowRow({ label: "Front windows", qty: 4 });
-    createWindowRow({ label: "Living room", qty: 2 });
-    createWindowRow({ label: "Rear sliders", qty: 1 });
-
-    [
-      jobNameInput,
-      customerEmailInput,
-      customerPhoneInput,
-      customerAddressInput,
-      defaultPricePerSqFtInput,
-      taxRateInput
-    ].forEach((input) => {
-      input.addEventListener("input", recalcAll);
-    });
-
-    addWindowBtn.addEventListener("click", () => {
-      createWindowRow();
-      recalcAll();
-    });
-
-    // Film + glass change handlers
-    filmSelect.addEventListener("change", () => {
-      const film = findFilmById(filmSelect.value);
-      if (film && typeof film.defaultPricePerSqFt === "number") {
-        defaultPricePerSqFtInput.value = film.defaultPricePerSqFt;
-      }
-      updateFilmGlassStatus();
-      recalcAll();
-    });
-
-    glassTypeSelect.addEventListener("change", () => {
-      updateFilmGlassStatus();
-      recalcAll();
-    });
-
-    // Print button
-    if (printQuoteBtn) {
-      printQuoteBtn.addEventListener("click", () => {
-        window.print();
-      });
-    }
-
-    initTabs();
-    initQuoteMeta();
-
-    updateFilmGlassStatus();
-    recalcAll();
-  });
-
-
-    // Print button
-    if (printQuoteBtn) {
-      printQuoteBtn.addEventListener("click", () => {
-        window.print();
-      });
-    }
-
-    initTabs();
-    initQuoteMeta();
-
-    // Initial calc
-    recalcAll();
-  }
-
-  initDefaults();
-});
+  function getCompatibility
