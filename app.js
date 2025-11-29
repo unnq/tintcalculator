@@ -172,6 +172,10 @@ document.addEventListener("DOMContentLoaded", () => {
   const quoteGrandTotalEl = document.getElementById("quoteGrandTotal");
   const quoteAvgPriceEl = document.getElementById("quoteAvgPrice");
   const quoteTbody = document.getElementById("quoteTbody");
+  const quoteFilmEl = document.getElementById("quoteFilm");
+  const quoteGlassTypeEl = document.getElementById("quoteGlassType");
+  const quoteCompatEl = document.getElementById("quoteCompat");
+
 
   const printQuoteBtn = document.getElementById("printQuoteBtn");
 
