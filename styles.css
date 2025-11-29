@@ -52,7 +52,7 @@ body {
     radial-gradient(circle at top left, rgba(59, 130, 246, 0.12), transparent 60%),
     radial-gradient(circle at bottom right, rgba(8, 47, 73, 0.45), transparent 65%),
     linear-gradient(135deg, #020617, #020617);
-  box-shadow: var(--shadow-soft);
+
   border: 1px solid rgba(148, 163, 184, 0.16);
   backdrop-filter: blur(18px);
 }
@@ -106,7 +106,7 @@ body {
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-subtle);
   padding: 14px 14px 12px;
-  box-shadow: var(--shadow-subtle);
+
 }
 
 .panel h2 {
@@ -166,7 +166,7 @@ body {
   color: var(--text-main);
   font-size: 0.9rem;
   outline: none;
-  transition: border 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition: border 0.15s ease, background 0.15s ease;
 }
 
 .field input::placeholder {
@@ -175,7 +175,7 @@ body {
 
 .field input:focus {
   border-color: var(--accent);
-  box-shadow: 0 0 0 1px rgba(59, 130, 246, 0.3);
+  
   background: #020617;
 }
 
