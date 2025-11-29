@@ -393,3 +393,47 @@ hr {
     padding: 6px 6px;
   }
 }
+
+
+
+/* Column minimum widths for window table */
+#windowsTable th:nth-child(1),
+#windowsTable td:nth-child(1) {
+  min-width: 190px; /* Label column */
+}
+
+#windowsTable th:nth-child(2),
+#windowsTable td:nth-child(2) {
+  min-width: 70px; /* Qty */
+  text-align: center;
+}
+
+#windowsTable th:nth-child(3),
+#windowsTable th:nth-child(4) {
+  min-width: 90px; /* Width / Height */
+}
+
+#windowsTable td:nth-child(3),
+#windowsTable td:nth-child(4) {
+  min-width: 90px;
+}
+
+#windowsTable th:nth-child(5),
+#windowsTable th:nth-child(6) {
+  min-width: 110px; /* Sq ft columns */
+}
+
+#windowsTable th:nth-child(7),
+#windowsTable td:nth-child(7) {
+  min-width: 120px; /* Price per sq ft */
+}
+
+#windowsTable th:nth-child(8),
+#windowsTable td:nth-child(8) {
+  min-width: 110px; /* Row cost */
+}
+
+/* Make inputs inside table cells less cramped */
+.table-wrapper td input {
+  min-width: 70px;
+}
