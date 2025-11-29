@@ -1,5 +1,137 @@
 // app.js - Window Tint Estimate + Quote
 
+// ---- Film-to-glass data ------------------------------------
+
+const GLASS_TYPES = [
+  {
+    id: "single_pane_clear",
+    label: "Single pane (1–60 sq ft) – Clear"
+  },
+  {
+    id: "single_pane_tinted",
+    label: "Single pane (1–60 sq ft) – Tinted"
+  },
+  {
+    id: "single_dual_pane_laminated",
+    label: "Single & dual pane (1–40 sq ft) – Laminated"
+  },
+  {
+    id: "dual_pane_clear",
+    label: "Dual pane (1–40 sq ft) – Clear"
+  },
+  {
+    id: "dual_pane_tinted",
+    label: "Dual pane (1–40 sq ft) – Tinted"
+  },
+  {
+    id: "dual_pane_low_e_surface_2",
+    label: "Dual pane Low E (1–40 sq ft) – Surface 2"
+  },
+  {
+    id: "dual_pane_low_e_surface_3",
+    label: "Dual pane Low E (1–40 sq ft) – Surface 3"
+  },
+  {
+    id: "triple_pane_clear",
+    label: "Triple pane (1–40 sq ft) – Clear"
+  },
+  {
+    id: "tempered_heat_strengthened",
+    label: "All panes tempered or heat strengthened – glass breakage safe"
+  }
+];
+
+// NOTE: For now compatibility objects are mostly empty. You’ll fill these from
+// the XPEL chart: use "safe", "conditional", or "not_warranted" per glass type.
+const FILMS = [
+  // SPECIALTY SERIES
+  {
+    id: "all_season_intell_65_ps",
+    name: "All Season Intell 65 PS",
+    category: "Specialty Series",
+    defaultPricePerSqFt: 14,
+    compatibility: {
+      // Example of how to encode (replace with your real chart values):
+      // single_pane_clear: "safe",
+      // dual_pane_low_e_surface_3: "conditional",
+    }
+  },
+  {
+    id: "all_season_45_ps",
+    name: "All Season 45 PS",
+    category: "Specialty Series",
+    defaultPricePerSqFt: 13,
+    compatibility: {}
+  },
+
+  // CLEAR VIEW
+  { id: "clear_view_plus_70_ps", name: "Clear View Plus 70% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {} },
+  { id: "clear_view_plus_55_ps", name: "Clear View Plus 55% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {} },
+  { id: "clear_view_plus_40_ps", name: "Clear View Plus 40% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {} },
+  { id: "clear_view_plus_20_ps", name: "Clear View Plus 20% PS", category: "Clear View", defaultPricePerSqFt: 13, compatibility: {} },
+  { id: "clear_view_alloy_65_ps", name: "Clear View Alloy 65 PS", category: "Clear View", defaultPricePerSqFt: 14, compatibility: {} },
+  { id: "clear_view_alloy_50_ps", name: "Clear View Alloy 50 PS", category: "Clear View", defaultPricePerSqFt: 14, compatibility: {} },
+  { id: "clear_view_alloy_40_ps", name: "Clear View Alloy 40 PS", category: "Clear View", defaultPricePerSqFt: 14, compatibility: {} },
+  { id: "clear_view_alloy_25_ps", name: "Clear View Alloy 25 PS", category: "Clear View", defaultPricePerSqFt: 14, compatibility: {} },
+  { id: "clear_view_ceramic_60_ps", name: "Clear View Ceramic 60 PS", category: "Clear View", defaultPricePerSqFt: 15, compatibility: {} },
+  { id: "clear_view_ceramic_50_ps", name: "Clear View Ceramic 50 PS", category: "Clear View", defaultPricePerSqFt: 15, compatibility: {} },
+  { id: "clear_view_ceramic_35_ps", name: "Clear View Ceramic 35 PS", category: "Clear View", defaultPricePerSqFt: 15, compatibility: {} },
+
+  // NEUTRAL
+  { id: "daylight_50_ps", name: "Daylight 50 PS", category: "Neutral", defaultPricePerSqFt: 11, compatibility: {} },
+  { id: "daylight_28_ps", name: "Daylight 28 PS", category: "Neutral", defaultPricePerSqFt: 11, compatibility: {} },
+  { id: "dark_neutral_25_da", name: "Dark Neutral 25 DA", category: "Neutral", defaultPricePerSqFt: 11, compatibility: {} },
+  { id: "dark_neutral_15_da", name: "Dark Neutral 15 DA", category: "Neutral", defaultPricePerSqFt: 11, compatibility: {} },
+
+  // METALLIC
+  { id: "evening_view_45_da", name: "Evening View 45 DA", category: "Metallic", defaultPricePerSqFt: 10, compatibility: {} },
+  { id: "evening_view_35_da", name: "Evening View 35 DA", category: "Metallic", defaultPricePerSqFt: 10, compatibility: {} },
+  { id: "evening_view_25_da", name: "Evening View 25 DA", category: "Metallic", defaultPricePerSqFt: 10, compatibility: {} },
+  { id: "evening_view_15_da", name: "Evening View 15 DA", category: "Metallic", defaultPricePerSqFt: 10, compatibility: {} },
+  { id: "evening_view_5_da", name: "Evening View 5 DA", category: "Metallic", defaultPricePerSqFt: 10, compatibility: {} },
+  { id: "blend_dr_37_ps", name: "Blend DR 37 PS", category: "Metallic", defaultPricePerSqFt: 10, compatibility: {} },
+  { id: "blend_dr_27_ps", name: "Blend DR 27 PS", category: "Metallic", defaultPricePerSqFt: 10, compatibility: {} },
+  { id: "blend_dr_17_ps", name: "Blend DR 17 PS", category: "Metallic", defaultPricePerSqFt: 10, compatibility: {} },
+  { id: "silver_50_ps", name: "Silver 50 PS", category: "Metallic", defaultPricePerSqFt: 9, compatibility: {} },
+  { id: "silver_15_ps", name: "Silver 15 PS", category: "Metallic", defaultPricePerSqFt: 9, compatibility: {} },
+
+  // METALLIC (Cont.)
+  { id: "bronze_40_ps", name: "Bronze 40 PS", category: "Metallic (Cont.)", defaultPricePerSqFt: 9, compatibility: {} },
+  { id: "bronze_25_ps", name: "Bronze 25 PS", category: "Metallic (Cont.)", defaultPricePerSqFt: 9, compatibility: {} },
+
+  // EXTERIOR
+  { id: "exterior_clear_perf_75_ps", name: "Exterior Clear Perf 75 PS", category: "Exterior", defaultPricePerSqFt: 16, compatibility: {} },
+  { id: "exterior_neutral_40_ps", name: "Exterior Neutral 40 PS", category: "Exterior", defaultPricePerSqFt: 16, compatibility: {} },
+  { id: "exterior_neutral_20_ps", name: "Exterior Neutral 20 PS", category: "Exterior", defaultPricePerSqFt: 16, compatibility: {} },
+  { id: "exterior_silver_15_ps", name: "Exterior Silver 15 PS", category: "Exterior", defaultPricePerSqFt: 16, compatibility: {} },
+  { id: "exterior_blend_dr_7_ps", name: "Exterior Blend DR 7 PS", category: "Exterior", defaultPricePerSqFt: 16, compatibility: {} },
+
+  // SECURITY CLEAR
+  { id: "security_clear_4mil_ps", name: "Security Clear 4mil PS", category: "Security Clear", defaultPricePerSqFt: 18, compatibility: {} },
+  { id: "security_clear_8mil_ps", name: "Security Clear 8mil PS", category: "Security Clear", defaultPricePerSqFt: 18, compatibility: {} },
+  { id: "security_clear_14mil_ps", name: "Security Clear 14mil PS", category: "Security Clear", defaultPricePerSqFt: 18, compatibility: {} },
+  { id: "exterior_security_clear_7mil", name: "Exterior Security Clear 7mil", category: "Security Clear", defaultPricePerSqFt: 18, compatibility: {} },
+  { id: "security_8mil_clear_view_plus_70", name: "Security 8mil Clear View Plus 70", category: "Security Clear", defaultPricePerSqFt: 19, compatibility: {} },
+  { id: "security_8mil_neutral_50_ps", name: "Security 8mil Neutral 50 PS", category: "Security Clear", defaultPricePerSqFt: 19, compatibility: {} },
+  { id: "security_8mil_neutral_35_ps", name: "Security 8mil Neutral 35 PS", category: "Security Clear", defaultPricePerSqFt: 19, compatibility: {} },
+  { id: "security_8mil_silver_15_ps", name: "Security 8mil Silver 15 PS", category: "Security Clear", defaultPricePerSqFt: 19, compatibility: {} },
+
+  // ANTI-GRAFFITI
+  { id: "anti_graffiti_4mil_ps", name: "Anti-Graffiti 4mil PS", category: "Anti-Graffiti", defaultPricePerSqFt: 20, compatibility: {} },
+  { id: "anti_graffiti_6mil_ps", name: "Anti-Graffiti 6mil PS", category: "Anti-Graffiti", defaultPricePerSqFt: 20, compatibility: {} },
+
+  // DECORATIVE
+  { id: "white_frost", name: "White Frost", category: "Decorative", defaultPricePerSqFt: 14, compatibility: {} },
+  { id: "black_out", name: "Black Out", category: "Decorative", defaultPricePerSqFt: 14, compatibility: {} },
+  { id: "white_out", name: "White Out", category: "Decorative", defaultPricePerSqFt: 14, compatibility: {} },
+  { id: "bird_safe_dotted", name: "Bird Safe Dotted", category: "Decorative", defaultPricePerSqFt: 15, compatibility: {} },
+  { id: "blister_prevention", name: "Blister Prevention", category: "Decorative", defaultPricePerSqFt: 15, compatibility: {} },
+  { id: "dusted_crystal", name: "Dusted Crystal", category: "Decorative", defaultPricePerSqFt: 15, compatibility: {} }
+];
+
+
+
+
 document.addEventListener("DOMContentLoaded", () => {
   const windowsTbody = document.getElementById("windowsTbody");
   const addWindowBtn = document.getElementById("addWindowBtn");
