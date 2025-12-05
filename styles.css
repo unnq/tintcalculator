@@ -126,6 +126,7 @@ hr {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
   min-height: 100vh;
+  height: 100vh;
 }
 
 /* --------------------------------------------------
@@ -418,6 +419,10 @@ hr {
 
 .portal-panel.active {
   display: block;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-strong) transparent;
+  scrollbar-gutter: stable;
 }
 
 .user-menu-trigger {
