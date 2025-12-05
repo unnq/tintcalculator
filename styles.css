@@ -260,7 +260,6 @@ hr {
   background: var(--accent);
   border-color: var(--accent);
   color: #111827;
-  box-shadow: 0 8px 16px rgba(250, 204, 21, 0.28);
   transform: translateY(-1px);
 }
 
