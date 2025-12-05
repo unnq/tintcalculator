@@ -258,6 +258,85 @@ hr {
   padding-inline: 8px;
 }
 
+.portal-sidebar.collapsed .sidebar-section-toggle {
+  padding-inline: 4px;
+  justify-content: center;
+}
+
+.portal-sidebar.collapsed .section-title,
+.portal-sidebar.collapsed .section-pill {
+  display: none;
+}
+
+.portal-sidebar.collapsed .section-chevron {
+  display: none;
+}
+
+sidebar-sections {
+   display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.sidebar-section {
+  border-radius: 12px;
+  padding: 4px;
+  transition: background 0.15s ease;
+}
+
+.sidebar-section:hover {
+  background: rgba(249, 250, 251, 0.9);
+}
+
+/* Section header */
+
+.sidebar-section-toggle {
+  width: 100%;
+  border: none;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  cursor: pointer;
+  color: var(--text-muted);
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+
+.section-title {
+  flex: 1;
+  text-align: left;
+}
+
+.section-pill {
+  padding: 2px 7px;
+  border-radius: 999px;
+  border: 1px solid var(--border-subtle);
+  font-size: 0.7rem;
+  color: var(--text-subtle);
+  background: #f9fafb;
+}
+
+.section-chevron {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.16s ease;
+}
+
+/* When section collapsed */
+
+.sidebar-section.collapsed .sidebar-section-body {
+  display: none;
+}
+
+.sidebar-section.collapsed .section-chevron {
+  transform: rotate(-90deg);
+}
+
 /* Main */
 
 .portal-main {
