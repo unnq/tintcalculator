@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Pi Tape Roll Length & Inventory Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="app-header">
+      <div>
+        <h1>Pi Tape Roll Calculator</h1>
+        <p>Measure roll diameter, estimate remaining length, and log inventory.</p>
+      </div>
+      <div class="brand-tag">
+        <span>Tint Co.</span>
+      </div>
+    </header>
+
+    <nav class="top-nav">
+      <a href="index.html">← Window Tint Estimator</a>
+      <span class="nav-dot">•</span>
+      <span>Pi Tape & Inventory Demo</span>
+    </nav>
+
+    <main class="layout-pi">
+      <!-- LEFT: CALCULATOR -->
+      <section class="panel">
+        <h2>Pi Tape Roll Calculator</h2>
+
+        <p class="helper-text">
+          Measure the roll with a pi tape, select the film, and the tool estimates remaining length and square footage.
+        </p>
+
+        <form id="piForm" class="pi-form">
+          <div class="field-row">
+            <div class="field">
+              <label for="piFilm">Film</label>
+              <select id="piFilm">
+                <!-- options injected by JS -->
+              </select>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="piOuterDiameter">Outer diameter (inches)</label>
+              <input id="piOuterDiameter" type="number" step="0.01" min="0" required />
+            </div>
+            <div class="field">
+              <label for="piCoreDiameter">Core diameter (inches)</label>
+              <input id="piCoreDiameter" type="number" step="0.01" min="0" value="3" required />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="piOriginalLength">Original roll length (ft)</label>
+              <input id="piOriginalLength" type="number" step="1" min="1" value="100" required />
+            </div>
+            <div class="field">
+              <label for="piWidth">Roll width (inches)</label>
+              <input id="piWidth" type="number" step="0.01" min="0" value="40" />
+            </div>
+          </div>
+
+          <button type="submit" class="btn-secondary">Calculate remaining</button>
+        </form>
+
+        <div id="piResult" class="pi-result">
+          <!-- filled by JS -->
+        </div>
+
+        <section class="panel panel-nested">
+          <h3 class="quote-box-title">Save as Inventory</h3>
+          <p class="helper-text">
+            Optionally tag this roll with a label or location and save it into the inventory list below.
+          </p>
+
+          <div class="field-row">
+            <div class="field">
+              <label for="piRollLabel">Roll label / location</label>
+              <input
+                id="piRollLabel"
+                type="text"
+                placeholder="e.g. XR Black 20 – Rack A2"
+              />
+            </div>
+          </div>
+
+          <button id="saveRollBtn" type="button" class="btn-secondary" disabled>
+            Save roll to inventory
+          </button>
+        </section>
+      </section>
+
+      <!-- RIGHT: INVENTORY TABLE -->
+      <aside class="panel summary">
+        <h2>Inventory (demo)</h2>
+        <p class="helper-text">
+          Data is stored in your browser only (localStorage) for this GitHub Pages demo.
+        </p>
+
+        <div class="table-wrapper small">
+          <table class="inventory-table">
+            <thead>
+              <tr>
+                <th>Label</th>
+                <th>Film</th>
+                <th>Length (ft)</th>
+                <th>Sq ft</th>
+                <th>% of roll</th>
+                <th>Updated</th>
+              </tr>
+            </thead>
+            <tbody id="inventoryBody">
+              <!-- rows injected by JS -->
+            </tbody>
+          </table>
+        </div>
+
+        <button id="clearInventoryBtn" type="button" class="btn-icon danger" style="margin-top: 10px;">
+          Clear demo data
+        </button>
+      </aside>
+    </main>
+
+    <footer class="app-footer">
+      <span>Pi Tape Roll Calculator &amp; Inventory Demo</span>
+      <span class="dot">•</span>
+      <span>Built for internal use</span>
+    </footer>
+  </div>
+
+  <script src="pitape.js"></script>
+</body>
+</html>
