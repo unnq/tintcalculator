@@ -2,297 +2,552 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Window Tint Estimate Calculator</title>
+  <title>Tint Co. Employee Portal</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <div class="app">
-    <header class="app-header">
-      <div>
-        <h1>Window Tint Estimate</h1>
-        <p>Estimate and generate a customer-facing quote for tint jobs.</p>
-      </div>
-      <div class="brand-tag">
-        <span>Tint Co.</span>
-      </div>
-    </header>
+  <!-- LOGIN VIEW -->
+  <div id="loginView" class="auth-view">
+    <div class="auth-card">
+      <h1>Tint Co. Employee Portal</h1>
+      <p class="auth-subtitle">Demo login – use any email and password.</p>
 
-    <nav class="top-nav">
-      <span>Window Tint Estimate</span>
-      <span class="nav-dot">•</span>
-      <a href="pitape.html">Pi Tape &amp; Inventory Demo →</a>
-    </nav>
+      <form id="loginForm" class="auth-form">
+        <div class="field">
+          <label for="loginEmail">Email</label>
+          <input id="loginEmail" type="email" placeholder="you@tintco.com" required />
+        </div>
+        <div class="field">
+          <label for="loginPassword">Password</label>
+          <input id="loginPassword" type="password" placeholder="••••••••" required />
+        </div>
+        <button type="submit" class="btn-secondary auth-btn">Login</button>
+      </form>
 
-
-    <!-- TABS -->
-    <div class="tabs">
-      <button class="tab-btn active" data-tab="estimate">Estimate</button>
-      <button class="tab-btn" data-tab="quote">Quote</button>
-    </div>
-
-    <!-- TAB 1: ESTIMATE -->
-    <div id="tab-estimate" class="tab-panel active">
-      <main class="layout">
-        <!-- LEFT COLUMN -->
-        <section class="left-column">
-          <!-- Job & Pricing Panel -->
-          <section class="panel">
-  <h2>Job & Pricing</h2>
-
-  <div class="field-row">
-    <div class="field">
-      <label for="jobName">Job name / reference</label>
-      <input id="jobName" type="text" placeholder="e.g. Smith Residence – Front Windows" />
+      <p class="fine-print">
+        This is a demo environment. Any credentials will log you in and show the internal tools.
+      </p>
     </div>
   </div>
 
-  <div class="field-row">
-    <div class="field">
-      <label for="customerEmail">Customer email</label>
-      <input id="customerEmail" type="email" placeholder="customer@example.com" />
-    </div>
-    <div class="field">
-      <label for="customerPhone">Customer phone</label>
-      <input id="customerPhone" type="tel" placeholder="(555) 555-5555" />
-    </div>
-  </div>
+  <!-- PORTAL / DASHBOARD VIEW -->
+  <div id="portalView" class="portal hidden">
+    <div class="portal-shell">
+      <!-- SIDEBAR -->
+      <aside id="portalSidebar" class="portal-sidebar">
+        <div class="sidebar-header">
+          <span class="sidebar-logo">TC</span>
+          <span class="sidebar-title">Tools</span>
+          <button id="sidebarToggle" class="btn-icon sidebar-toggle" type="button">⟨⟩</button>
+        </div>
 
-  <div class="field-row">
-    <div class="field">
-      <label for="customerAddress">Customer address</label>
-      <input id="customerAddress" type="text" placeholder="123 Main St, City, CA 90000" />
-    </div>
-  </div>
+        <nav class="sidebar-nav">
+          <button
+            class="sidebar-link active"
+            data-panel="overview"
+            type="button"
+          >
+            Overview
+          </button>
+          <button
+            class="sidebar-link"
+            data-panel="estimate"
+            type="button"
+          >
+            Estimate Tool
+          </button>
+          <button
+            class="sidebar-link"
+            data-panel="pitape"
+            type="button"
+          >
+            Pi Tape &amp; Inventory
+          </button>
+        </nav>
+      </aside>
 
-  <!-- NEW: film / glass / compatibility row -->
-  <div class="field-row">
-    <div class="field">
-      <label for="filmSelect">Film</label>
-      <select id="filmSelect">
-        <!-- options injected by JS -->
-      </select>
-    </div>
-    <div class="field">
-      <label for="glassTypeSelect">Glass type</label>
-      <select id="glassTypeSelect">
-        <!-- options injected by JS -->
-      </select>
-    </div>
-    <div class="field field-status">
-      <label>Film to glass</label>
-      <div id="filmGlassStatus" class="status-pill status-unknown">
-        <span class="status-dot"></span>
-        <span id="filmGlassStatusText">Select film &amp; glass</span>
-      </div>
-    </div>
-  </div>
-
-  <div class="field-row">
-    <div class="field">
-      <label for="defaultPricePerSqFt">Default price per sq ft ($)</label>
-      <input
-        id="defaultPricePerSqFt"
-        type="number"
-        min="0"
-        step="0.25"
-        value="12"
-      />
-    </div>
-    <div class="field">
-      <label for="taxRate">Tax rate (%)</label>
-      <input
-        id="taxRate"
-        type="number"
-        min="0"
-        step="0.01"
-        value="8.75"
-      />
-    </div>
-  </div>
-
-  <p class="helper-text">
-    Dimensions are entered in inches and automatically converted to square feet.
-    Each window row has its own price per sq ft.
-  </p>
-</section>
-
-
-          <!-- Windows Table Panel -->
-          <section class="panel">
-            <div class="panel-header">
-              <h2>Windows</h2>
-              <button id="addWindowBtn" type="button" class="btn-secondary">
-                + Add window
-              </button>
-            </div>
-
-            <div class="table-wrapper">
-              <table id="windowsTable">
-                <thead>
-                  <tr>
-                    <th>Label</th>
-                    <th>Qty</th>
-                    <th>Width (in)</th>
-                    <th>Height (in)</th>
-                    <th>Sq ft / window</th>
-                    <th>Row sq ft</th>
-                    <th>Price per sq ft ($)</th>
-                    <th>Row cost</th>
-                    <th></th>
-                  </tr>
-                </thead>
-                <tbody id="windowsTbody">
-                  <!-- Rows injected by JS -->
-                </tbody>
-              </table>
-            </div>
-
-            <p class="helper-text">
-              Example labels: “Living room left”, “Front door side lite”, “Rear sliders”.
+      <!-- MAIN CONTENT -->
+      <main class="portal-main">
+        <!-- TOP BAR -->
+        <header class="portal-topbar">
+          <div>
+            <h2>Dashboard</h2>
+            <p class="portal-topbar-subtitle">
+              Internal tools for estimates, film inventory, and job insights.
             </p>
-          </section>
+          </div>
+          <div class="portal-user">
+            <span class="portal-user-name" id="portalUserName">Demo Rep</span>
+          </div>
+        </header>
+
+        <!-- PANELS -->
+        <!-- 1) OVERVIEW PANEL -->
+        <section id="panel-overview" class="portal-panel active">
+          <div class="overview-grid">
+            <div class="overview-card">
+              <h3>Today’s Summary</h3>
+              <p class="overview-metric">6 active estimates</p>
+              <p class="overview-sub">3 pending approvals · 2 scheduled installs</p>
+            </div>
+            <div class="overview-card">
+              <h3>Film Usage (demo)</h3>
+              <p class="overview-metric">1,240 sq ft</p>
+              <p class="overview-sub">Total tinted this week</p>
+            </div>
+            <div class="overview-card">
+              <h3>Inventory Health</h3>
+              <p class="overview-metric">XR PLUS 5: 2.4 rolls</p>
+              <p class="overview-sub">Based on pi-tape entries</p>
+            </div>
+          </div>
+
+          <div class="overview-strip">
+            <h3>Tools</h3>
+            <p class="helper-text">
+              Use the left sidebar to jump into the Estimate Tool or Pi Tape &amp; Inventory.
+              This demonstrates how internal tools can live inside one employee portal.
+            </p>
+          </div>
         </section>
 
-        <!-- RIGHT COLUMN: SUMMARY -->
-        <aside class="summary panel">
-          <h2>Estimate Summary</h2>
+        <!-- 2) ESTIMATE TOOL PANEL -->
+        <section id="panel-estimate" class="portal-panel">
+          <!-- Your existing estimate + quote app, unchanged -->
+          <div class="app">
+            <header class="app-header">
+              <div>
+                <h1>Window Tint Estimate</h1>
+                <p>Estimate and generate a customer-facing quote for tint jobs.</p>
+              </div>
+              <div class="brand-tag">
+                <span>Tint Co.</span>
+              </div>
+            </header>
 
-          <div class="summary-row">
-            <span>Job name</span>
-            <span id="summaryJobName" class="summary-value-muted">–</span>
+            <!-- TABS -->
+            <div class="tabs">
+              <button class="tab-btn active" data-tab="estimate">Estimate</button>
+              <button class="tab-btn" data-tab="quote">Quote</button>
+            </div>
+
+            <!-- TAB 1: ESTIMATE -->
+            <div id="tab-estimate" class="tab-panel active">
+              <main class="layout">
+                <!-- LEFT COLUMN -->
+                <section class="left-column">
+                  <!-- Job & Pricing Panel -->
+                  <section class="panel">
+                    <h2>Job &amp; Pricing</h2>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="jobName">Job name / reference</label>
+                        <input id="jobName" type="text" placeholder="e.g. Smith Residence – Front Windows" />
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="customerEmail">Customer email</label>
+                        <input id="customerEmail" type="email" placeholder="customer@example.com" />
+                      </div>
+                      <div class="field">
+                        <label for="customerPhone">Customer phone</label>
+                        <input id="customerPhone" type="tel" placeholder="(555) 555-5555" />
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="customerAddress">Customer address</label>
+                        <input id="customerAddress" type="text" placeholder="123 Main St, City, CA 90000" />
+                      </div>
+                    </div>
+
+                    <!-- film / glass / compatibility row -->
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="filmSelect">Film</label>
+                        <select id="filmSelect">
+                          <!-- options injected by JS -->
+                        </select>
+                      </div>
+                      <div class="field">
+                        <label for="glassTypeSelect">Glass type</label>
+                        <select id="glassTypeSelect">
+                          <!-- options injected by JS -->
+                        </select>
+                      </div>
+                      <div class="field field-status">
+                        <label>Film to glass</label>
+                        <div id="filmGlassStatus" class="status-pill status-unknown">
+                          <span class="status-dot"></span>
+                          <span id="filmGlassStatusText">Select film &amp; glass</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div class="field-row">
+                      <div class="field">
+                        <label for="defaultPricePerSqFt">Default price per sq ft ($)</label>
+                        <input
+                          id="defaultPricePerSqFt"
+                          type="number"
+                          min="0"
+                          step="0.25"
+                          value="12"
+                        />
+                      </div>
+                      <div class="field">
+                        <label for="taxRate">Tax rate (%)</label>
+                        <input
+                          id="taxRate"
+                          type="number"
+                          min="0"
+                          step="0.01"
+                          value="8.75"
+                        />
+                      </div>
+                    </div>
+
+                    <p class="helper-text">
+                      Dimensions are entered in inches and automatically converted to square feet.
+                      Each window row has its own price per sq ft.
+                    </p>
+                  </section>
+
+                  <!-- Windows Table Panel -->
+                  <section class="panel">
+                    <div class="panel-header">
+                      <h2>Windows</h2>
+                      <button id="addWindowBtn" type="button" class="btn-secondary">
+                        + Add window
+                      </button>
+                    </div>
+
+                    <div class="table-wrapper">
+                      <table id="windowsTable">
+                        <thead>
+                          <tr>
+                            <th>Label</th>
+                            <th>Qty</th>
+                            <th>Width (in)</th>
+                            <th>Height (in)</th>
+                            <th>Sq ft / window</th>
+                            <th>Row sq ft</th>
+                            <th>Price per sq ft ($)</th>
+                            <th>Row cost</th>
+                            <th></th>
+                          </tr>
+                        </thead>
+                        <tbody id="windowsTbody">
+                          <!-- Rows injected by JS -->
+                        </tbody>
+                      </table>
+                    </div>
+
+                    <p class="helper-text">
+                      Example labels: “Living room left”, “Front door side lite”, “Rear sliders”.
+                    </p>
+                  </section>
+                </section>
+
+                <!-- RIGHT COLUMN: SUMMARY -->
+                <aside class="summary panel">
+                  <h2>Estimate Summary</h2>
+
+                  <div class="summary-row">
+                    <span>Job name</span>
+                    <span id="summaryJobName" class="summary-value-muted">–</span>
+                  </div>
+
+                  <hr />
+
+                  <div class="summary-row">
+                    <span>Total windows</span>
+                    <span id="totalWindows">0</span>
+                  </div>
+                  <div class="summary-row">
+                    <span>Total square footage</span>
+                    <span id="totalSqFt">0.00 sq ft</span>
+                  </div>
+
+                  <div class="summary-row">
+                    <span>Avg price per sq ft</span>
+                    <span id="summaryPricePerSqFt">$0.00</span>
+                  </div>
+
+                  <hr />
+
+                  <div class="summary-row">
+                    <span>Material subtotal</span>
+                    <span id="subtotal">$0.00</span>
+                  </div>
+                  <div class="summary-row">
+                    <span>Tax</span>
+                    <span id="taxAmount">$0.00</span>
+                  </div>
+
+                  <div class="summary-row summary-total">
+                    <span>Estimated total</span>
+                    <span id="grandTotal">$0.00</span>
+                  </div>
+
+                  <p class="fine-print">
+                    This is a rough estimate only. Final pricing may vary based on on-site measurements,
+                    film type, and additional labor or travel.
+                  </p>
+                </aside>
+              </main>
+            </div>
+
+            <!-- TAB 2: QUOTE (CUSTOMER FACING) -->
+            <div id="tab-quote" class="tab-panel">
+              <section class="panel quote-panel" id="quotePanel">
+                <div class="quote-header">
+                  <div>
+                    <h2>Window Tint Quote</h2>
+                    <p class="quote-subtitle">Prepared by Tint Co.</p>
+                  </div>
+                  <div class="quote-header-right">
+                    <button id="printQuoteBtn" type="button" class="btn-secondary">
+                      🖨 Print / Save as PDF
+                    </button>
+                  </div>
+                </div>
+
+                <div class="quote-columns">
+                  <div class="quote-box">
+                    <h3 class="quote-box-title">Customer</h3>
+                    <p><strong id="quoteJobName">–</strong></p>
+                    <p id="quoteCustomerAddress">–</p>
+                    <p id="quoteCustomerPhone">–</p>
+                    <p id="quoteCustomerEmail">–</p>
+                  </div>
+
+                  <div class="quote-box">
+                    <h3 class="quote-box-title">Quote Info</h3>
+                    <p><span class="quote-label">Quote #:</span> <span id="quoteId">–</span></p>
+                    <p><span class="quote-label">Date:</span> <span id="quoteDate">–</span></p>
+                    <p><span class="quote-label">Film:</span> <span id="quoteFilm">–</span></p>
+                    <p><span class="quote-label">Glass type:</span> <span id="quoteGlassType">–</span></p>
+                    <p><span class="quote-label">Compatibility:</span> <span id="quoteCompat">–</span></p>
+                    <p><span class="quote-label">Total sq ft:</span> <span id="quoteTotalSqFt">0.00 sq ft</span></p>
+                    <p><span class="quote-label">Total windows:</span> <span id="quoteTotalWindows">0</span></p>
+                  </div>
+                </div>
+
+                <h3 class="quote-section-title">Tinting Details</h3>
+                <div class="quote-table-wrapper">
+                  <table class="quote-table">
+                    <thead>
+                      <tr>
+                        <th>Label</th>
+                        <th>Qty</th>
+                        <th>Size (in)</th>
+                        <th>Row sq ft</th>
+                        <th>Price / sq ft</th>
+                        <th>Line total</th>
+                      </tr>
+                    </thead>
+                    <tbody id="quoteTbody">
+                      <!-- Filled from estimate -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <div class="quote-totals">
+                  <div class="quote-totals-row">
+                    <span>Subtotal</span>
+                    <span id="quoteSubtotal">$0.00</span>
+                  </div>
+                  <div class="quote-totals-row">
+                    <span>Tax</span>
+                    <span id="quoteTax">$0.00</span>
+                  </div>
+                  <div class="quote-totals-row quote-totals-grand">
+                    <span>Total</span>
+                    <span id="quoteGrandTotal">$0.00</span>
+                  </div>
+                  <div class="quote-totals-row quote-totals-muted">
+                    <span>Average price per sq ft</span>
+                    <span id="quoteAvgPrice">$0.00</span>
+                  </div>
+                </div>
+
+                <p class="fine-print">
+                  This quote is based on the measurements and information provided. Final price may be
+                  adjusted after on-site verification and film selection. Thank you for the opportunity
+                  to earn your business.
+                </p>
+              </section>
+            </div>
+
+            <footer class="app-footer">
+              <span>Window Tint Estimate &amp; Quote</span>
+              <span class="dot">•</span>
+              <span>Built for demo use</span>
+            </footer>
           </div>
+        </section>
 
-          <hr />
+        <!-- 3) PI TAPE / INVENTORY PANEL -->
+        <section id="panel-pitape" class="portal-panel">
+          <div class="panel">
+            <h2>Pi Tape Roll Inventory</h2>
+            <p class="helper-text">
+              Use the pi tape to estimate remaining film and track inventory in square feet.
+              This is a local demo – values are stored in your browser only.
+            </p>
 
-          <div class="summary-row">
-            <span>Total windows</span>
-            <span id="totalWindows">0</span>
+            <main class="layout-pi">
+              <!-- LEFT: UPDATE TOOL -->
+              <section class="panel">
+                <h3>Update Film Inventory</h3>
+                <p class="helper-text">
+                  Select a film, adjust full rolls and a pi-taped partial roll, and see the change live.
+                </p>
+
+                <form id="piForm" class="pi-form">
+                  <div class="field-row">
+                    <div class="field">
+                      <label for="piFilm">Film</label>
+                      <select id="piFilm">
+                        <!-- options injected by pitape.js -->
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label for="piRep">Rep name</label>
+                      <input
+                        id="piRep"
+                        type="text"
+                        placeholder="e.g. Alex"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="field-row">
+                    <div class="field">
+                      <label for="piAction">Action</label>
+                      <select id="piAction">
+                        <option value="add">Add to inventory</option>
+                        <option value="remove">Remove from inventory</option>
+                      </select>
+                    </div>
+                    <div class="field">
+                      <label for="piFullRolls">Full rolls (standard length)</label>
+                      <input
+                        id="piFullRolls"
+                        type="number"
+                        step="1"
+                        min="0"
+                        value="0"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="field-row">
+                    <div class="field">
+                      <label for="piOuterDiameter">Pi tape – outer diameter (in)</label>
+                      <input
+                        id="piOuterDiameter"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        placeholder="Optional"
+                      />
+                    </div>
+                    <div class="field">
+                      <label for="piCoreDiameter">Core diameter (in)</label>
+                      <input
+                        id="piCoreDiameter"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value="3"
+                      />
+                    </div>
+                  </div>
+
+                  <div class="field-row">
+                    <div class="field">
+                      <label for="piOriginalLength">Standard roll length (ft)</label>
+                      <input
+                        id="piOriginalLength"
+                        type="number"
+                        step="1"
+                        min="1"
+                        value="100"
+                      />
+                    </div>
+                    <div class="field">
+                      <label for="piWidth">Roll width (in)</label>
+                      <input
+                        id="piWidth"
+                        type="number"
+                        step="0.01"
+                        min="0"
+                        value="40"
+                      />
+                    </div>
+                  </div>
+
+                  <button type="submit" class="btn-secondary">
+                    Apply update
+                  </button>
+                </form>
+
+                <div id="piResult" class="pi-result">
+                  <p>Adjust the values above to see a live preview before applying the update.</p>
+                </div>
+              </section>
+
+              <!-- RIGHT: INVENTORY TABLE -->
+              <aside class="panel summary">
+                <h3>Inventory (all films)</h3>
+                <p class="helper-text">
+                  All films are listed; rows update as reps add or remove inventory.
+                </p>
+
+                <div class="table-wrapper small">
+                  <table class="inventory-table">
+                    <thead>
+                      <tr>
+                        <th>Film</th>
+                        <th>Total sq ft</th>
+                        <th>Linear ft</th>
+                        <th>Full-roll equiv.</th>
+                        <th>Last updated</th>
+                        <th>Rep</th>
+                      </tr>
+                    </thead>
+                    <tbody id="inventoryBody">
+                      <!-- rows injected by pitape.js -->
+                    </tbody>
+                  </table>
+                </div>
+
+                <button
+                  id="clearInventoryBtn"
+                  type="button"
+                  class="btn-icon danger"
+                  style="margin-top: 10px;"
+                >
+                  Clear demo data
+                </button>
+              </aside>
+            </main>
           </div>
-          <div class="summary-row">
-            <span>Total square footage</span>
-            <span id="totalSqFt">0.00 sq ft</span>
-          </div>
-
-          <div class="summary-row">
-            <span>Avg price per sq ft</span>
-            <span id="summaryPricePerSqFt">$0.00</span>
-          </div>
-
-          <hr />
-
-          <div class="summary-row">
-            <span>Material subtotal</span>
-            <span id="subtotal">$0.00</span>
-          </div>
-          <div class="summary-row">
-            <span>Tax</span>
-            <span id="taxAmount">$0.00</span>
-          </div>
-
-          <div class="summary-row summary-total">
-            <span>Estimated total</span>
-            <span id="grandTotal">$0.00</span>
-          </div>
-
-          <p class="fine-print">
-            This is a rough estimate only. Final pricing may vary based on on-site measurements,
-            film type, and additional labor or travel.
-          </p>
-        </aside>
+        </section>
       </main>
     </div>
-
-    <!-- TAB 2: QUOTE (CUSTOMER FACING) -->
-    <div id="tab-quote" class="tab-panel">
-      <section class="panel quote-panel" id="quotePanel">
-        <div class="quote-header">
-          <div>
-            <h2>Window Tint Quote</h2>
-            <p class="quote-subtitle">Prepared by Tint Co.</p>
-          </div>
-          <div class="quote-header-right">
-            <button id="printQuoteBtn" type="button" class="btn-secondary">
-              🖨 Print / Save as PDF
-            </button>
-          </div>
-        </div>
-
-        <div class="quote-columns">
-          <div class="quote-box">
-            <h3 class="quote-box-title">Customer</h3>
-            <p><strong id="quoteJobName">–</strong></p>
-            <p id="quoteCustomerAddress">–</p>
-            <p id="quoteCustomerPhone">–</p>
-            <p id="quoteCustomerEmail">–</p>
-          </div>
-
-          <div class="quote-box">
-  <h3 class="quote-box-title">Quote Info</h3>
-  <p><span class="quote-label">Quote #:</span> <span id="quoteId">–</span></p>
-  <p><span class="quote-label">Date:</span> <span id="quoteDate">–</span></p>
-  <p><span class="quote-label">Film:</span> <span id="quoteFilm">–</span></p>
-  <p><span class="quote-label">Glass type:</span> <span id="quoteGlassType">–</span></p>
-  <p><span class="quote-label">Compatibility:</span> <span id="quoteCompat">–</span></p>
-  <p><span class="quote-label">Total sq ft:</span> <span id="quoteTotalSqFt">0.00 sq ft</span></p>
-  <p><span class="quote-label">Total windows:</span> <span id="quoteTotalWindows">0</span></p>
-</div>
-
-        </div>
-
-        <h3 class="quote-section-title">Tinting Details</h3>
-        <div class="quote-table-wrapper">
-          <table class="quote-table">
-            <thead>
-              <tr>
-                <th>Label</th>
-                <th>Qty</th>
-                <th>Size (in)</th>
-                <th>Row sq ft</th>
-                <th>Price / sq ft</th>
-                <th>Line total</th>
-              </tr>
-            </thead>
-            <tbody id="quoteTbody">
-              <!-- Filled from estimate -->
-            </tbody>
-          </table>
-        </div>
-
-        <div class="quote-totals">
-          <div class="quote-totals-row">
-            <span>Subtotal</span>
-            <span id="quoteSubtotal">$0.00</span>
-          </div>
-          <div class="quote-totals-row">
-            <span>Tax</span>
-            <span id="quoteTax">$0.00</span>
-          </div>
-          <div class="quote-totals-row quote-totals-grand">
-            <span>Total</span>
-            <span id="quoteGrandTotal">$0.00</span>
-          </div>
-          <div class="quote-totals-row quote-totals-muted">
-            <span>Average price per sq ft</span>
-            <span id="quoteAvgPrice">$0.00</span>
-          </div>
-        </div>
-
-        <p class="fine-print">
-          This quote is based on the measurements and information provided. Final price may be
-          adjusted after on-site verification and film selection. Thank you for the opportunity
-          to earn your business.
-        </p>
-      </section>
-    </div>
-
-    <footer class="app-footer">
-      <span>Window Tint Estimate &amp; Quote</span>
-      <span class="dot">•</span>
-      <span>Built for demo use</span>
-    </footer>
   </div>
 
+  <!-- Scripts -->
   <script src="app.js"></script>
+  <script src="pitape.js"></script>
+  <script src="portal.js"></script>
 </body>
 </html>
