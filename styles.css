@@ -1469,6 +1469,6 @@ td.numeric-cell {
   input,
   select,
   textarea {
-     font-seize: 16px !important;
+     font-size: 16px !important;
   }
 }
