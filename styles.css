@@ -764,3 +764,84 @@ hr {
     display: none !important;
   }
 }
+
+
+/* ---- Pi tape page layout ------------------------------------------------ */
+
+.top-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.82rem;
+  color: var(--text-subtle);
+  margin-bottom: 12px;
+}
+
+.top-nav a {
+  color: #bfdbfe;
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 4px 8px;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  background: rgba(15, 23, 42, 0.9);
+}
+
+.top-nav a:hover {
+  border-color: var(--accent);
+}
+
+.top-nav .nav-dot {
+  opacity: 0.6;
+}
+
+.layout-pi {
+  display: grid;
+  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  gap: 16px;
+  align-items: flex-start;
+}
+
+.pi-form {
+  display: grid;
+  gap: 10px;
+  margin-top: 8px;
+}
+
+.pi-result {
+  margin-top: 12px;
+  font-size: 0.9rem;
+  background: #020617;
+  border-radius: 12px;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  padding: 10px 11px;
+}
+
+.table-wrapper.small {
+  max-height: 360px;
+}
+
+.inventory-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.78rem;
+}
+
+.inventory-table th,
+.inventory-table td {
+  padding: 6px 7px;
+  border-bottom: 1px solid rgba(31, 41, 55, 0.9);
+}
+
+.inventory-table th {
+  font-weight: 500;
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #d1d5db;
+}
+
+@media (max-width: 860px) {
+  .layout-pi {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
