@@ -346,6 +346,14 @@ hr {
   display: none;
 }
 
+@media (min-width: 769px) {
+  /* Never show the top hamburger on desktop */
+  .portal-menu-toggle {
+    display: none !important;
+  }
+}
+
+
 /* User / user menu */
 
 .portal-user {
@@ -1373,7 +1381,7 @@ td.numeric-cell {
     box-shadow: 0 18px 45px rgba(15, 23, 42, 0.35);
   }
 
-  /* On mobile, .collapsed = open drawer (full width, labels visible) */
+  /* On mobile, .collapsed = drawer OPEN */
   .portal-sidebar.collapsed {
     transform: translateX(0);
   }
@@ -1389,13 +1397,18 @@ td.numeric-cell {
     display: block;
   }
 
-  /* Show hamburger on mobile */
+  /* Show hamburger on mobile (topbar) */
   .portal-menu-toggle {
     display: inline-flex;
   }
 
-  /* Hide desktop sidebar toggle on mobile, it's redundant */
+  /* Default: hide sidebar toggle on mobile */
   .sidebar-toggle {
     display: none;
+  }
+
+  /* When drawer is open, show sidebar toggle as a close button */
+  .portal-sidebar.collapsed .sidebar-toggle {
+    display: inline-flex;
   }
 }
