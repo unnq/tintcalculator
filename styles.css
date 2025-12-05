@@ -1311,6 +1311,10 @@ td.numeric-cell {
     align-items: flex-start;
   }
 
+ .auth-card {
+    margin-top: 2vh;
+ }
+
   .tabs {
     flex-wrap: wrap;
   }
