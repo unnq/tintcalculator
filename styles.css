@@ -19,6 +19,7 @@
 
   --text-main: #111827;
   --text-muted: #6b7280;
+  --text-dark: #0a0a0a;
   --text-subtle: #9ca3af;
 
   --danger: #ef4444;
@@ -237,6 +238,7 @@ hr {
   width: 100%;
   text-align: left;
   padding: 7px 10px;
+  color: var(--text-dark);
   border-radius: var(--radius-full);
   border: 1px solid transparent;
   background: transparent;
