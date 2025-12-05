@@ -34,11 +34,7 @@ body {
   color: var(--text-main);
 }
 
-body {
-  display: flex;
-  align-items: stretch;
-  justify-content: center;
-}
+
 
 /* App shell */
 
