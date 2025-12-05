@@ -1465,4 +1465,10 @@ td.numeric-cell {
   .portal-sidebar.collapsed .sidebar-toggle {
     display: inline-flex;
   }
+
+  input,
+  select,
+  textarea {
+     font-seize: 16px !important;
+  }
 }
