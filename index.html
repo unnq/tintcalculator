@@ -44,32 +44,40 @@
           <button id="sidebarToggle" class="btn-icon sidebar-toggle" type="button">⟨⟩</button>
         </div>
 
-        <nav class="sidebar-nav">
-          <button
-            class="sidebar-link active"
-            data-panel="overview"
-            type="button"
-          >
-            <span class="sidebar-icon">🏠</span>
-            <span class="sidebar-label">Overview</span>
-          </button>
-          <button
-            class="sidebar-link"
-            data-panel="estimate"
-            type="button"
-          >
-            <span class="sidebar-icon">📋</span>
-            <span class="sidebar-label">Estimate Tool</span>
-          </button>
-          <button
-            class="sidebar-link"
-            data-panel="pitape"
-            type="button"
-          >
-            <span class="sidebar-icon">📏</span>
-            <span class="sidebar-label">Pi Tape &amp; Inventory</span>
-          </button>
-        </nav>
+       <nav class="sidebar-nav">
+        <button class="sidebar-link active" data-panel="overview" type="button">
+          <span class="sidebar-icon">
+            <!-- Home Icon -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M3 10L12 3L21 10V20C21 20.6 20.6 21 20 21H4C3.4 21 3 20.6 3 20V10Z" 
+                    stroke="currentColor" stroke-width="2" stroke-linejoin="round"/>
+            </svg>
+          </span>
+          <span class="sidebar-label">Overview</span>
+        </button>
+      
+        <button class="sidebar-link" data-panel="estimate" type="button">
+          <span class="sidebar-icon">
+            <!-- Clipboard Icon -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M9 3H15C15.6 3 16 3.4 16 4V5H18C18.6 5 19 5.4 19 6V20C19 20.6 18.6 21 18 21H6C5.4 21 5 20.6 5 20V6C5 5.4 5.4 5 6 5H8V4C8 3.4 8.4 3 9 3Z" 
+                    stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </span>
+          <span class="sidebar-label">Estimate Tool</span>
+        </button>
+      
+        <button class="sidebar-link" data-panel="pitape" type="button">
+          <span class="sidebar-icon">
+            <!-- Ruler Icon -->
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M3 17L17 3L21 7L7 21L3 17Z" stroke="currentColor" stroke-width="2"/>
+              <path d="M14 6L18 10" stroke="currentColor" stroke-width="2"/>
+            </svg>
+          </span>
+          <span class="sidebar-label">Pi Tape &amp; Inventory</span>
+        </button>
+      </nav>
 
       </aside>
 
