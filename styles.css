@@ -1341,32 +1341,39 @@ td.numeric-cell {
 }
 
 /* --------------------------------------------------
-   Print – show only quote panel
+   Print – show only quote panel inside Estimate tool
 -------------------------------------------------- */
-
 @media print {
   body {
     background: #ffffff;
   }
 
-  .auth-view,
+  /* Hide login screen entirely */
+  .auth-view {
+    display: none !important;
+  }
+
+  /* Hide sidebar, topbar, backdrop, other panels */
   .portal-sidebar,
   .portal-topbar,
-  .portal-panel:not(#panel-estimate),
-  .tabs,
-  .app-footer {
+  .sidebar-backdrop,
+  .portal-panel {
     display: none !important;
+  }
+
+  /* Only show the Estimate panel */
+  #panel-estimate {
+    display: block !important;
   }
 
   .portal-main {
     padding: 0;
   }
 
-  .app {
-    box-shadow: none;
-    border: none;
-    border-radius: 0;
-    padding: 0;
+  /* Inside the Estimate app: hide tabs, show Quote tab */
+  .tabs,
+  .app-footer {
+    display: none !important;
   }
 
   #tab-estimate {
@@ -1377,6 +1384,7 @@ td.numeric-cell {
     display: block !important;
   }
 
+  /* Make the quote panel print cleanly */
   #quotePanel {
     border-radius: 0;
     border: none;
@@ -1390,10 +1398,12 @@ td.numeric-cell {
     background: #ffffff !important;
   }
 
+  /* Hide buttons (Print / etc.) */
   .btn-secondary {
     display: none !important;
   }
 }
+
 
 /* --------------------------------------------------
    Sidebar backdrop + mobile drawer behavior
