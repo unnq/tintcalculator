@@ -153,6 +153,8 @@ hr {
   font-family: var(--font-reg);
   letter-spacing: 0.01em;
   z-index: 100;
+  position: sticky;
+  top: 0;
 }
 
 .demo-banner a {
