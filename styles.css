@@ -369,7 +369,7 @@ hr {
   display: flex;
   flex-direction: column;
   gap: 14px;
-  max-height: 100vh;
+  max-height: 95vh;
 }
 
 /* Top bar */
