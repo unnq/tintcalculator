@@ -1297,9 +1297,6 @@ td.numeric-cell {
 }
 
 @media (max-width: 600px) {
-  .auth-card {
-    padding-inline: 18px;
-  }
 
   .portal-main {
     padding-inline: 14px;
