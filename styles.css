@@ -112,7 +112,8 @@ hr {
 .auth-form {
   margin-top: 8px;
   display: grid;
-  gap: 12px;
+  gap: 1.4rem;
+  padding: 1.4rem 0;
 }
 
 .auth-btn {
@@ -615,18 +616,17 @@ button {
 }
 
 .btn-secondary {
-  padding: 7px 12px;
-  border-radius: var(--radius-full);
+  padding: .8rem;
+  border-radius: var(--radius-md);
   border: 1px solid rgba(148, 163, 184, 0.6);
   background: #111827;
   color: #f9fafb;
-  font-size: 0.82rem;
-  display: inline-flex;
+  font-size: 0.85rem;
+  font-weight: 500;
   align-items: center;
   gap: 6px;
   cursor: pointer;
-  transition: background 0.15s ease, border 0.15s ease, transform 0.08s ease,
-    box-shadow 0.15s ease;
+  transition: background 0.15s ease, border 0.15s ease, transform 0.08s ease;
 }
 
 .btn-secondary:hover {
