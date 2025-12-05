@@ -230,4 +230,199 @@ function renderInventory() {
         td.style.textAlign = "right";
         td.style.fontVariantNumeric = "tabular-nums";
       }
-      tr.appendChild(td)
+      tr.appendChild(td);
+    });
+
+    tbody.appendChild(tr);
+  });
+}
+
+// Live preview of this change, in sq ft
+function updatePreview() {
+  const resultEl = document.getElementById("piResult");
+  if (!resultEl) return;
+
+  const filmId = document.getElementById("piFilm").value;
+  const film = PI_FILMS.find((f) => f.id === filmId);
+  if (!film) {
+    resultEl.textContent = "Select a film.";
+    return;
+  }
+
+  const payload = computeUpdatePayload(film);
+  const {
+    action,
+    safeFullRolls,
+    safeRollLength,
+    widthFeet,
+    fullRollFeet,
+    fullRollSqFt,
+    partialFeet,
+    partialSqFt,
+    partialPercentOfRoll,
+    changeFeetRaw,
+    changeSqFtRaw,
+  } = payload;
+
+  const rollSqFtFallback = safeRollLength * widthFeet;
+  const rec = getRecordForFilm(film.id, safeRollLength, rollSqFtFallback);
+
+  const previewNewSqFt = Math.max(0, rec.squareFeet + payload.signedChangeSqFt);
+  const previewNewFeet = Math.max(0, rec.lengthFeet + payload.signedChangeFeet);
+  const rollSqFt = rec.rollSqFt || rollSqFtFallback || (safeRollLength * widthFeet);
+  const currentFullRollEquiv = rollSqFt > 0 ? rec.squareFeet / rollSqFt : 0;
+  const previewFullRollEquiv = rollSqFt > 0 ? previewNewSqFt / rollSqFt : 0;
+
+  const parts = [];
+  if (safeFullRolls > 0) {
+    parts.push(
+      `${safeFullRolls} full roll(s) ≈ ${fullRollSqFt.toFixed(1)} sq ft (${fullRollFeet.toFixed(
+        1
+      )} ft)`
+    );
+  }
+  if (partialFeet > 0) {
+    parts.push(
+      `pi-taped roll ≈ ${partialSqFt.toFixed(1)} sq ft (${partialFeet.toFixed(
+        1
+      )} ft ≈ ${partialPercentOfRoll.toFixed(0)}% of a ${safeRollLength} ft roll)`
+    );
+  }
+
+  if (!parts.length) {
+    resultEl.innerHTML = `
+      <p><strong>${film.name}</strong></p>
+      <p>No full rolls or pi-tape values entered yet.</p>
+      <p><strong>Current total:</strong> ${rec.squareFeet.toFixed(
+        1
+      )} sq ft (${rec.lengthFeet.toFixed(1)} ft, ${currentFullRollEquiv.toFixed(
+        2
+      )} rolls)</p>
+    `;
+    return;
+  }
+
+  const directionLabel = action === "remove" ? "removed from" : "added to";
+  const sign = action === "remove" ? "-" : "+";
+
+  resultEl.innerHTML = `
+    <p><strong>${film.name}</strong></p>
+    <p><strong>This update (preview):</strong> ${parts.join(" + ")}</p>
+    <p><strong>Change:</strong> ${sign}${changeSqFtRaw.toFixed(
+      1
+    )} sq ft (${sign}${changeFeetRaw.toFixed(1)} ft) ${directionLabel} inventory.</p>
+    <hr />
+    <p><strong>Current total:</strong> ${rec.squareFeet.toFixed(
+      1
+    )} sq ft (${rec.lengthFeet.toFixed(1)} ft, ${currentFullRollEquiv.toFixed(
+      2
+    )} rolls)</p>
+    <p><strong>After update:</strong> ${previewNewSqFt.toFixed(
+      1
+    )} sq ft (${previewNewFeet.toFixed(1)} ft, ${previewFullRollEquiv.toFixed(
+      2
+    )} rolls)</p>
+    ${
+      partialFeet > 0
+        ? `<p class="helper-text">Pi-taped roll area uses width ${widthFeet.toFixed(
+            2
+          )} ft (${(widthFeet * 12).toFixed(0)}").</p>`
+        : ""
+    }
+  `;
+}
+
+// ---- form + buttons ------------------------------------------------
+
+function initPiForm() {
+  const form = document.getElementById("piForm");
+  const repInput = document.getElementById("piRep");
+
+  if (!form) return;
+
+  // load stored rep
+  const storedRep = localStorage.getItem(REP_KEY) || "";
+  if (repInput) {
+    repInput.value = storedRep;
+    repInput.addEventListener("input", () => {
+      localStorage.setItem(REP_KEY, repInput.value.trim());
+    });
+  }
+
+  // Live preview on any change
+  const liveInputs = [
+    "piFilm",
+    "piAction",
+    "piFullRolls",
+    "piOuterDiameter",
+    "piCoreDiameter",
+    "piOriginalLength",
+    "piWidth",
+  ];
+  liveInputs.forEach((id) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    const evt = el.tagName === "SELECT" ? "change" : "input";
+    el.addEventListener(evt, updatePreview);
+  });
+
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+
+    const filmId = document.getElementById("piFilm").value;
+    const film = PI_FILMS.find((f) => f.id === filmId);
+    if (!film) return;
+
+    const repName = repInput ? repInput.value.trim() : "";
+
+    const payload = computeUpdatePayload(film);
+    const {
+      safeRollLength,
+      widthFeet,
+      signedChangeFeet,
+      signedChangeSqFt,
+    } = payload;
+
+    const rollSqFtFallback = safeRollLength * widthFeet;
+    const rec = getRecordForFilm(film.id, safeRollLength, rollSqFtFallback);
+
+    rec.squareFeet = Math.max(0, rec.squareFeet + signedChangeSqFt);
+    rec.lengthFeet = Math.max(0, rec.lengthFeet + signedChangeFeet);
+    rec.rollLengthFt = safeRollLength;
+    rec.rollSqFt = rollSqFtFallback;
+    rec.lastUpdatedAt = new Date().toISOString();
+    rec.lastUpdatedBy = repName;
+
+    inventoryByFilm[film.id] = rec;
+    saveInventory();
+    renderInventory();
+    updatePreview(); // refresh with new "current total"
+  });
+
+  updatePreview(); // initial
+}
+
+function initClearButton() {
+  const clearBtn = document.getElementById("clearInventoryBtn");
+  if (!clearBtn) return;
+
+  clearBtn.addEventListener("click", () => {
+    if (!Object.keys(inventoryByFilm).length) return;
+    if (!confirm("Clear all demo inventory data from this browser?")) return;
+
+    inventoryByFilm = {};
+    saveInventory();
+    renderInventory();
+    updatePreview();
+  });
+}
+
+// ---- init ---------------------------------------------------------
+
+document.addEventListener("DOMContentLoaded", () => {
+  loadInventory();
+  renderFilmOptions();
+  initPiForm();
+  initClearButton();
+  renderInventory();
+});
