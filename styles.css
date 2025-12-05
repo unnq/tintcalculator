@@ -198,6 +198,15 @@ hr {
   box-shadow: 0 0 0 1px rgba(217, 119, 6, 0.2);
 }
 
+.login-logo {
+  width: 180px;
+  max-width: 80%;
+  height: auto;
+  display: block;
+  margin-bottom: 12px;
+}
+
+
 .sidebar-title {
   font-size: 0.95rem;
   font-weight: 600;
@@ -322,6 +331,17 @@ hr {
   justify-content: center;
   transition: transform 0.16s ease;
 }
+
+.sidebar-logo-img {
+  height: 28px;
+  width: auto;
+  display: block;
+}
+
+.portal-sidebar.collapsed .sidebar-logo-img {
+  display: none;
+}
+
 
 /* When section collapsed */
 
