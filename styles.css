@@ -899,7 +899,7 @@ td input:focus {
 }
 
 td.numeric-cell {
-  text-align: right;
+  text-align: left;
   font-variant-numeric: tabular-nums;
 }
 
@@ -1013,7 +1013,6 @@ td.numeric-cell {
 
 .quote-box {
   flex: 1 1 220px;
-  border-radius: 12px;
   border: 1px solid var(--border-subtle);
   padding: 10px 11px;
   background: #f9fafb;
