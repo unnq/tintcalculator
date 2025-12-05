@@ -23,12 +23,12 @@
 
   --danger: #ef4444;
 
-  --radius-lg: 16px;
-  --radius-md: 12px;
-  --radius-full: 999px;
+  --radius-lg: .9rem;
+  --radius-md: .5rem;
+  --radius-full: 1rem;
 
-  --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.08);
-  --shadow-subtle: 0 6px 20px rgba(15, 23, 42, 0.05);
+  --shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.01);
+  --shadow-subtle: 0 6px 20px rgba(15, 23, 42, 0.02);
 
   --input-bg: #ffffff;
 }
@@ -229,9 +229,17 @@ hr {
 
 .sidebar-icon {
   width: 22px;
-  text-align: center;
-  font-size: 1rem;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-muted);
 }
+
+.sidebar-link.active .sidebar-icon {
+  color: #111827;
+}
+
 
 .sidebar-label {
   white-space: nowrap;
