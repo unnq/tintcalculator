@@ -91,6 +91,13 @@ hr {
   box-shadow: var(--shadow-soft);
 }
 
+.auth-card-head {
+   display: flex;
+   flex-direction: column;
+   justify: center;
+}
+   
+
 .auth-card h1 {
   margin: 0;
   font-size: 1.5rem;
