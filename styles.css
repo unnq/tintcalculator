@@ -594,6 +594,8 @@ hr {
 .panel {
   background: var(--bg-surface);
   padding: 1rem;
+  border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
 
 }
 
