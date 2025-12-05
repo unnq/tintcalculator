@@ -1,4 +1,4 @@
-// portal.js – handles login, sidebar toggle, and switching between dashboard panels
+// portal.js – handles login, sidebar toggle, panel switching, and section collapse
 
 document.addEventListener("DOMContentLoaded", () => {
   const loginView = document.getElementById("loginView");
@@ -9,8 +9,12 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const sidebar = document.getElementById("portalSidebar");
   const sidebarToggle = document.getElementById("sidebarToggle");
-  const sidebarLinks = document.querySelectorAll(".sidebar-link");
+
+  // Only links that actually map to a panel
+  const panelLinks = document.querySelectorAll(".sidebar-link[data-panel]");
   const panels = document.querySelectorAll(".portal-panel");
+
+  const sectionToggles = document.querySelectorAll(".sidebar-section-toggle");
 
   // ---- Demo login ----
   if (loginForm) {
@@ -20,7 +24,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const emailVal = (loginEmail.value || "").trim();
       const displayName = emailVal || "Demo Rep";
 
-      // simple demo: no auth, just show dashboard
       loginView.classList.add("hidden");
       portalView.classList.remove("hidden");
 
@@ -30,39 +33,50 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  // ---- Sidebar toggle ----
+  // ---- Sidebar collapse toggle ----
   if (sidebarToggle && sidebar) {
     sidebarToggle.addEventListener("click", () => {
       sidebar.classList.toggle("collapsed");
     });
   }
 
-  // ---- Panel switching ----
+  // ---- Section expand / collapse ----
+  sectionToggles.forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const sectionName = btn.getAttribute("data-section-toggle");
+      if (!sectionName) return;
+
+      const sectionEl = document.querySelector(
+        `.sidebar-section[data-section="${sectionName}"]`
+      );
+      if (!sectionEl) return;
+
+      sectionEl.classList.toggle("collapsed");
+    });
+  });
+
+  // ---- Panel switching (Tools section items) ----
   function showPanel(name) {
     panels.forEach((panel) => {
-      panel.classList.toggle(
-        "active",
-        panel.id === `panel-${name}`
-      );
+      panel.classList.toggle("active", panel.id === `panel-${name}`);
     });
 
-    sidebarLinks.forEach((btn) => {
+    panelLinks.forEach((btn) => {
       btn.classList.toggle(
         "active",
-        btn.dataset.panel === name
+        btn.getAttribute("data-panel") === name
       );
     });
   }
 
-  sidebarLinks.forEach((btn) => {
+  panelLinks.forEach((btn) => {
     btn.addEventListener("click", () => {
-      const panelName = btn.dataset.panel;
+      const panelName = btn.getAttribute("data-panel");
       if (!panelName) return;
       showPanel(panelName);
     });
   });
 
-  // default: overview is active
+  // Default: show overview, expand Tools; Projects/Leads start expanded too
   showPanel("overview");
 });
-
