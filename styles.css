@@ -1132,7 +1132,6 @@ td.numeric-cell {
   border-radius: var(--radius-full);
   font-size: 0.8rem;
   border: 1px solid transparent;
-  white-space: nowrap;
 }
 
 .status-dot {
