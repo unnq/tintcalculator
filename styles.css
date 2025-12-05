@@ -745,6 +745,7 @@ button {
   width: 100%;
   background: var(--bg-surface);
   border: 1px solid var(--border-subtle);
+  border-radius: var(--radius-md);
   box-shadow: var(--shadow-soft);
   padding: 1rem;
 }
@@ -1014,7 +1015,8 @@ td.numeric-cell {
 .quote-box {
   flex: 1 1 220px;
   border: 1px solid var(--border-subtle);
-  padding: 10px 11px;
+  border-radius: var(--radius-md);
+  padding: 1rem;
   background: #f9fafb;
   font-size: 0.86rem;
 }
@@ -1070,7 +1072,7 @@ td.numeric-cell {
 }
 
 .quote-totals {
-  margin-top: 12px;
+  margin-top: 1.2rem;
   max-width: 360px;
   margin-left: auto;
   font-size: 0.88rem;
