@@ -309,6 +309,8 @@ function renderInventory() {
     const rec = getRecordForFilm(film.id, DEFAULT_ROLL_LENGTH_FT, DEFAULT_ROLL_SQFT);
 
     const tr = document.createElement("tr");
+    tr.dataset.filmId = film.id; // <-- needed so clicks know which film
+
     if (!rec.squareFeet) {
       tr.style.opacity = "0.6";
     }
@@ -316,41 +318,38 @@ function renderInventory() {
     const rollSqFt = rec.rollSqFt || (rec.rollLengthFt || DEFAULT_ROLL_LENGTH_FT) * DEFAULT_WIDTH_FEET;
     const fullRollEquiv = rollSqFt > 0 ? rec.squareFeet / rollSqFt : 0;
 
-    // Threshold for low inventory
     const minSqFt = MIN_SQFT_BY_FILM[film.id] ?? 120;
 
-    // 0: Film name
+    // Name
     const nameTd = document.createElement("td");
     nameTd.textContent = film.name;
     tr.appendChild(nameTd);
 
-    // 1: Square feet (with low-inventory highlight)
+    // Sq ft (with low-inventory highlight)
     const sqFtTd = document.createElement("td");
     sqFtTd.textContent = `${rec.squareFeet.toFixed(1)} sq ft`;
     sqFtTd.style.textAlign = "right";
     sqFtTd.style.fontVariantNumeric = "tabular-nums";
-
     if (rec.squareFeet < minSqFt) {
       sqFtTd.classList.add("cell-low-inventory");
     }
-
     tr.appendChild(sqFtTd);
 
-    // 2: Length feet
+    // Length ft
     const lengthTd = document.createElement("td");
     lengthTd.textContent = `${rec.lengthFeet.toFixed(1)} ft`;
     lengthTd.style.textAlign = "right";
     lengthTd.style.fontVariantNumeric = "tabular-nums";
     tr.appendChild(lengthTd);
 
-    // 3: Roll equivalents
+    // Rolls
     const rollsTd = document.createElement("td");
     rollsTd.textContent = `${fullRollEquiv.toFixed(2)} rolls`;
     rollsTd.style.textAlign = "right";
     rollsTd.style.fontVariantNumeric = "tabular-nums";
     tr.appendChild(rollsTd);
 
-    // 4: Last updated date (with stale highlight)
+    // Last updated
     const dateTd = document.createElement("td");
     dateTd.textContent = formatDateTime(rec.lastUpdatedAt);
 
@@ -366,7 +365,7 @@ function renderInventory() {
 
     tr.appendChild(dateTd);
 
-    // 5: Last updated by
+    // Rep
     const byTd = document.createElement("td");
     byTd.textContent = rec.lastUpdatedBy || "—";
     tr.appendChild(byTd);
@@ -374,6 +373,7 @@ function renderInventory() {
     tbody.appendChild(tr);
   });
 }
+
 
 // Live preview of this change, in sq ft
 function updatePreview() {
@@ -555,6 +555,102 @@ function initClearButton() {
   });
 }
 
+// ---- Modal helpers ------------------------------------------------
+
+function openInventoryModal(filmId) {
+  const film = PI_FILMS.find((f) => f.id === filmId);
+  if (!film) return;
+
+  const rec = getRecordForFilm(film.id, DEFAULT_ROLL_LENGTH_FT, DEFAULT_ROLL_SQFT);
+  const rollSqFt = rec.rollSqFt || DEFAULT_ROLL_SQFT;
+  const fullRollEquiv = rollSqFt > 0 ? rec.squareFeet / rollSqFt : 0;
+
+  const minSqFt = MIN_SQFT_BY_FILM[film.id] ?? 120;
+  const isLow = rec.squareFeet < minSqFt;
+
+  const modal = document.getElementById("inventoryModal");
+  if (!modal) return;
+
+  // Fill fields
+  const nameEl = document.getElementById("modalFilmName");
+  const subtitleEl = document.getElementById("modalFilmSubtitle");
+  const statsMainEl = document.getElementById("modalFilmStatsMain");
+  const statsSecondaryEl = document.getElementById("modalFilmStatsSecondary");
+  const statusEl = document.getElementById("modalFilmStatus");
+  const thresholdEl = document.getElementById("modalFilmThreshold");
+  const updatedEl = document.getElementById("modalFilmUpdated");
+  const repEl = document.getElementById("modalFilmRep");
+
+  if (nameEl) nameEl.textContent = film.name;
+  if (subtitleEl) subtitleEl.textContent = "Inventory detail";
+
+  if (statsMainEl) {
+    statsMainEl.textContent = `${rec.squareFeet.toFixed(1)} sq ft · ${fullRollEquiv.toFixed(
+      2
+    )} rolls`;
+  }
+  if (statsSecondaryEl) {
+    statsSecondaryEl.textContent = `${rec.lengthFeet.toFixed(1)} ft estimated remaining`;
+  }
+
+  if (statusEl) {
+    statusEl.textContent = isLow ? "Low inventory" : "In stock";
+    statusEl.style.color = isLow ? "#b91c1c" : "#16a34a";
+  }
+
+  if (thresholdEl) {
+    thresholdEl.textContent = `Minimum target: ${minSqFt.toFixed(
+      0
+    )} sq ft · Currently ${rec.squareFeet.toFixed(1)} sq ft`;
+  }
+
+  if (updatedEl) {
+    updatedEl.textContent = formatDateTime(rec.lastUpdatedAt);
+  }
+
+  if (repEl) {
+    repEl.textContent = rec.lastUpdatedBy || "—";
+  }
+
+  modal.classList.remove("hidden");
+}
+
+function closeInventoryModal() {
+  const modal = document.getElementById("inventoryModal");
+  if (!modal) return;
+  modal.classList.add("hidden");
+}
+
+function initInventoryRowClicks() {
+  const tbody = document.getElementById("inventoryBody");
+  if (!tbody) return;
+
+  tbody.addEventListener("click", (event) => {
+    const tr = event.target.closest("tr");
+    if (!tr || !tr.dataset.filmId) return;
+    openInventoryModal(tr.dataset.filmId);
+  });
+
+  const modal = document.getElementById("inventoryModal");
+  const closeBtn = document.getElementById("inventoryModalClose");
+  const backdrop = modal ? modal.querySelector(".inventory-modal-backdrop") : null;
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", closeInventoryModal);
+  }
+  if (backdrop) {
+    backdrop.addEventListener("click", closeInventoryModal);
+  }
+
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      closeInventoryModal();
+    }
+  });
+}
+
+
+
 // ---- init ---------------------------------------------------------
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -563,4 +659,6 @@ document.addEventListener("DOMContentLoaded", () => {
   initPiForm();
   initClearButton();
   renderInventory();
+  initInventoryRowClicks(); // <-- enable row→modal behavior
 });
+
