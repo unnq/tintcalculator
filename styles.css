@@ -1218,7 +1218,7 @@ td.numeric-cell {
 
 .layout-pi {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 1fr);
   gap: 12px;
   align-items: flex-start;
 }
