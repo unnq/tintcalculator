@@ -915,6 +915,19 @@ td.numeric-cell {
   font-variant-numeric: tabular-nums;
 }
 
+/* Inventory indicators */
+.cell-low-inventory {
+  background: rgba(239, 68, 68, 0.08);
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+.cell-stale-date {
+  color: #b91c1c;
+  font-weight: 600;
+}
+
+
 /* Column minimum widths for window table */
 
 #windowsTable th:nth-child(1),
