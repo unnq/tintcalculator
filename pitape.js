@@ -153,13 +153,52 @@ const MIN_SQFT_BY_FILM = {
   // other films fall back to a generic threshold
 };
 
-// Seed demo inventory: how many “roll equivalents” each has, and how old
+// FULL seed inventory for all films
 const SEED_INVENTORY = {
-  xr_plus_5:   { rolls: 2.3, updatedDaysAgo: 2,  rep: "Alex R." },
+  // XR PLUS
+  xr_plus_5:   { rolls: 2.3, updatedDaysAgo: 3,  rep: "Alex R." },
+  xr_plus_15:  { rolls: 1.1, updatedDaysAgo: 12, rep: "Morgan T." },
   xr_plus_20:  { rolls: 0.8, updatedDaysAgo: 18, rep: "Morgan T." },
-  cs_black_35: { rolls: 1.6, updatedDaysAgo: 5,  rep: "Jamie L." },
+  xr_plus_30:  { rolls: 1.9, updatedDaysAgo: 7,  rep: "Jamie L." },
+  xr_plus_35:  { rolls: 0.5, updatedDaysAgo: 30, rep: "Sam K." },
+  xr_plus_45:  { rolls: 1.4, updatedDaysAgo: 15, rep: "Alex R." },
+  xr_plus_55:  { rolls: 0.2, updatedDaysAgo: 40, rep: "Sam K." },
+  xr_plus_70:  { rolls: 1.7, updatedDaysAgo: 2,  rep: "Jamie L." },
+
+  // XR BLACK
+  xr_black_5:  { rolls: 2.0, updatedDaysAgo: 10, rep: "Luis H." },
+  xr_black_15: { rolls: 0.6, updatedDaysAgo: 25, rep: "Sam K." },
+  xr_black_20: { rolls: 1.8, updatedDaysAgo: 6,  rep: "Morgan T." },
+  xr_black_30: { rolls: 0.3, updatedDaysAgo: 27, rep: "Alex R." },
+  xr_black_35: { rolls: 1.2, updatedDaysAgo: 13, rep: "Jamie L." },
+  xr_black_45: { rolls: 1.9, updatedDaysAgo: 3,  rep: "Luis H." },
+  xr_black_55: { rolls: 0.4, updatedDaysAgo: 22, rep: "Sam K." },
+  xr_black_70: { rolls: 1.0, updatedDaysAgo: 19, rep: "Morgan T." },
+
+  // XR BLUE
+  xr_blue_70:  { rolls: 0.9, updatedDaysAgo: 9,  rep: "Jamie L." },
+  xr_blue_80:  { rolls: 1.3, updatedDaysAgo: 4,  rep: "Luis H." },
+
+  // HP BLACK
+  hp_black_5:  { rolls: 0.7, updatedDaysAgo: 14, rep: "Alex R." },
   hp_black_15: { rolls: 0.3, updatedDaysAgo: 30, rep: "Sam K." },
+  hp_black_20: { rolls: 1.5, updatedDaysAgo: 11, rep: "Morgan T." },
+  hp_black_35: { rolls: 2.2, updatedDaysAgo: 1,  rep: "Jamie L." },
+  hp_black_50: { rolls: 0.6, updatedDaysAgo: 20, rep: "Alex R." },
+
+  // CS BLACK
+  cs_black_5:  { rolls: 1.1, updatedDaysAgo: 16, rep: "Luis H." },
+  cs_black_15: { rolls: 0.4, updatedDaysAgo: 35, rep: "Sam K." },
+  cs_black_20: { rolls: 0.9, updatedDaysAgo: 8,  rep: "Morgan T." },
+  cs_black_30: { rolls: 1.3, updatedDaysAgo: 5,  rep: "Jamie L." },
+  cs_black_35: { rolls: 1.6, updatedDaysAgo: 5,  rep: "Jamie L." },
+  cs_black_43: { rolls: 0.2, updatedDaysAgo: 42, rep: "Sam K." },
+  cs_black_50: { rolls: 0.5, updatedDaysAgo: 11, rep: "Morgan T." },
+  cs_black_55: { rolls: 1.0, updatedDaysAgo: 18, rep: "Alex R." },
+  cs_black_70: { rolls: 0.7, updatedDaysAgo: 9,  rep: "Luis H." },
+  cs_black_88: { rolls: 1.9, updatedDaysAgo: 3,  rep: "Jamie L." },
 };
+
 
 function buildSeedInventory() {
   const now = new Date();
