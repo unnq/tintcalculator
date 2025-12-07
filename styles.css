@@ -75,7 +75,7 @@ hr {
 -------------------------------------------------- */
 
 .auth-view {
-  min-height: 100vh;
+  min-height: 86vh;
   display: flex;
   align-items: flex-start;
   justify-content: center;
