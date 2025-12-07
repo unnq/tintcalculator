@@ -130,13 +130,13 @@ hr {
 -------------------------------------------------- */
 
 .portal {
-  min-height: 100vh;
+  min-height: 90vh;
 }
 
 .portal-shell {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr);
-  min-height: 100vh;
+  min-height: 90vh;
 }
 
 /* --------------------------------------------------
@@ -703,7 +703,7 @@ button {
   font-size: 0.78rem;
   text-transform: uppercase;
   letter-spacing: 0.1em;
-  color: var(--text-subtle);
+  color: var(--text-muted);
 }
 
 .field input,
@@ -741,7 +741,7 @@ button {
 .fine-print {
   margin-top: 12px;
   font-size: 0.75rem;
-  color: var(--text-subtle);
+  color: var(--text-muted);
 }
 
 /* --------------------------------------------------
