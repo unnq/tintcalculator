@@ -139,20 +139,80 @@ function computeUpdatePayload(film) {
 const STORAGE_KEY = "piTapeInventoryByFilm_sqft";
 const REP_KEY = "piTapeRepName";
 
+// Default assumptions for demo rolls
+const DEFAULT_ROLL_LENGTH_FT = 100;
+const DEFAULT_WIDTH_FEET = 40 / 12; // 40" roll
+const DEFAULT_ROLL_SQFT = DEFAULT_ROLL_LENGTH_FT * DEFAULT_WIDTH_FEET;
+
+// Per-film minimum thresholds (sq ft) for “low inventory” highlight
+const MIN_SQFT_BY_FILM = {
+  xr_plus_5: 180,
+  xr_plus_20: 120,
+  cs_black_35: 150,
+  hp_black_15: 100,
+  // other films fall back to a generic threshold
+};
+
+// Seed demo inventory: how many “roll equivalents” each has, and how old
+const SEED_INVENTORY = {
+  xr_plus_5:   { rolls: 2.3, updatedDaysAgo: 2,  rep: "Alex R." },
+  xr_plus_20:  { rolls: 0.8, updatedDaysAgo: 18, rep: "Morgan T." },
+  cs_black_35: { rolls: 1.6, updatedDaysAgo: 5,  rep: "Jamie L." },
+  hp_black_15: { rolls: 0.3, updatedDaysAgo: 30, rep: "Sam K." },
+};
+
+function buildSeedInventory() {
+  const now = new Date();
+  const result = {};
+
+  Object.entries(SEED_INVENTORY).forEach(([filmId, cfg]) => {
+    const rolls = cfg.rolls || 0;
+    const lengthFeet = rolls * DEFAULT_ROLL_LENGTH_FT;
+    const squareFeet = rolls * DEFAULT_ROLL_SQFT;
+
+    const days = cfg.updatedDaysAgo || 0;
+    const updated = new Date(
+      now.getTime() - days * 24 * 60 * 60 * 1000
+    ).toISOString();
+
+    result[filmId] = {
+      filmId,
+      squareFeet,
+      lengthFeet,
+      rollLengthFt: DEFAULT_ROLL_LENGTH_FT,
+      rollSqFt: DEFAULT_ROLL_SQFT,
+      lastUpdatedAt: updated,
+      lastUpdatedBy: cfg.rep || "",
+    };
+  });
+
+  return result;
+}
+
 let inventoryByFilm = {};
 // shape: { [filmId]: { filmId, squareFeet, lengthFeet, rollLengthFt, rollSqFt, lastUpdatedAt, lastUpdatedBy } }
 
 function loadInventory() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
-    inventoryByFilm = raw ? JSON.parse(raw) : {};
+    if (raw) {
+      inventoryByFilm = JSON.parse(raw);
+      return;
+    }
   } catch (err) {
-    inventoryByFilm = {};
+    console.warn("Failed to parse stored PI inventory, using seed data.", err);
   }
+
+  // If nothing stored, start with seeded demo data
+  inventoryByFilm = buildSeedInventory();
 }
 
 function saveInventory() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(inventoryByFilm));
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(inventoryByFilm));
+  } catch (err) {
+    console.warn("Failed to save PI inventory.", err);
+  }
 }
 
 // ---- UI helpers ---------------------------------------------------
@@ -187,8 +247,8 @@ function getRecordForFilm(filmId, rollLengthFallback, rollSqFtFallback) {
       filmId,
       squareFeet: 0,
       lengthFeet: 0,
-      rollLengthFt: rollLengthFallback || 100,
-      rollSqFt: rollSqFtFallback || (rollLengthFallback || 100) * (40 / 12),
+      rollLengthFt: rollLengthFallback || DEFAULT_ROLL_LENGTH_FT,
+      rollSqFt: rollSqFtFallback || (rollLengthFallback || DEFAULT_ROLL_LENGTH_FT) * DEFAULT_WIDTH_FEET,
       lastUpdatedAt: null,
       lastUpdatedBy: "",
     };
@@ -203,35 +263,74 @@ function renderInventory() {
 
   tbody.innerHTML = "";
 
+  const now = new Date();
+  const TWO_WEEKS_MS = 14 * 24 * 60 * 60 * 1000;
+
   PI_FILMS.forEach((film) => {
-    const rec = getRecordForFilm(film.id, 100, 100 * (40 / 12));
+    const rec = getRecordForFilm(film.id, DEFAULT_ROLL_LENGTH_FT, DEFAULT_ROLL_SQFT);
 
     const tr = document.createElement("tr");
     if (!rec.squareFeet) {
       tr.style.opacity = "0.6";
     }
 
-    const rollSqFt = rec.rollSqFt || (rec.rollLengthFt || 100) * (40 / 12);
+    const rollSqFt = rec.rollSqFt || (rec.rollLengthFt || DEFAULT_ROLL_LENGTH_FT) * DEFAULT_WIDTH_FEET;
     const fullRollEquiv = rollSqFt > 0 ? rec.squareFeet / rollSqFt : 0;
 
-    const cells = [
-      film.name,
-      `${rec.squareFeet.toFixed(1)} sq ft`,
-      `${rec.lengthFeet.toFixed(1)} ft`,
-      `${fullRollEquiv.toFixed(2)} rolls`,
-      formatDateTime(rec.lastUpdatedAt),
-      rec.lastUpdatedBy || "—",
-    ];
+    // Threshold for low inventory
+    const minSqFt = MIN_SQFT_BY_FILM[film.id] ?? 120;
 
-    cells.forEach((text, idx) => {
-      const td = document.createElement("td");
-      td.textContent = text;
-      if (idx === 1 || idx === 2 || idx === 3) {
-        td.style.textAlign = "right";
-        td.style.fontVariantNumeric = "tabular-nums";
+    // 0: Film name
+    const nameTd = document.createElement("td");
+    nameTd.textContent = film.name;
+    tr.appendChild(nameTd);
+
+    // 1: Square feet (with low-inventory highlight)
+    const sqFtTd = document.createElement("td");
+    sqFtTd.textContent = `${rec.squareFeet.toFixed(1)} sq ft`;
+    sqFtTd.style.textAlign = "right";
+    sqFtTd.style.fontVariantNumeric = "tabular-nums";
+
+    if (rec.squareFeet < minSqFt) {
+      sqFtTd.classList.add("cell-low-inventory");
+    }
+
+    tr.appendChild(sqFtTd);
+
+    // 2: Length feet
+    const lengthTd = document.createElement("td");
+    lengthTd.textContent = `${rec.lengthFeet.toFixed(1)} ft`;
+    lengthTd.style.textAlign = "right";
+    lengthTd.style.fontVariantNumeric = "tabular-nums";
+    tr.appendChild(lengthTd);
+
+    // 3: Roll equivalents
+    const rollsTd = document.createElement("td");
+    rollsTd.textContent = `${fullRollEquiv.toFixed(2)} rolls`;
+    rollsTd.style.textAlign = "right";
+    rollsTd.style.fontVariantNumeric = "tabular-nums";
+    tr.appendChild(rollsTd);
+
+    // 4: Last updated date (with stale highlight)
+    const dateTd = document.createElement("td");
+    dateTd.textContent = formatDateTime(rec.lastUpdatedAt);
+
+    if (rec.lastUpdatedAt) {
+      const d = new Date(rec.lastUpdatedAt);
+      if (!Number.isNaN(d.getTime())) {
+        const ageMs = now - d;
+        if (ageMs > TWO_WEEKS_MS) {
+          dateTd.classList.add("cell-stale-date");
+        }
       }
-      tr.appendChild(td);
-    });
+    }
+
+    tr.appendChild(dateTd);
+
+    // 5: Last updated by
+    const byTd = document.createElement("td");
+    byTd.textContent = rec.lastUpdatedBy || "—";
+    tr.appendChild(byTd);
 
     tbody.appendChild(tr);
   });
