@@ -1452,6 +1452,7 @@ td.numeric-cell {
 
   .portal-main {
     padding-inline: 14px;
+     max-height: 86vh;
   }
 
   .app-header {
