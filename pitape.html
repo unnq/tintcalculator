@@ -157,6 +157,70 @@
           Clear demo data
         </button>
       </aside>
+
+      <!-- Inventory detail modal (Pi Tape tool) -->
+<div id="inventoryModal" class="inventory-modal hidden">
+  <div class="inventory-modal-backdrop"></div>
+  <div class="inventory-modal-dialog">
+    <div class="inventory-modal-header">
+      <div>
+        <h3 id="modalFilmName" class="inventory-modal-title">Film name</h3>
+        <p id="modalFilmSubtitle" class="inventory-modal-subtitle">
+          Inventory detail
+        </p>
+      </div>
+      <button
+        id="inventoryModalClose"
+        type="button"
+        class="btn-icon"
+        aria-label="Close"
+      >
+        ✕
+      </button>
+    </div>
+
+    <div class="inventory-modal-body">
+      <div class="inventory-modal-grid">
+        <div class="inventory-modal-card">
+          <h4>Current stock</h4>
+          <p id="modalFilmStatsMain" class="inventory-modal-metric">
+            0.0 sq ft · 0.00 rolls
+          </p>
+          <p id="modalFilmStatsSecondary" class="inventory-modal-text">
+            0.0 ft estimated remaining
+          </p>
+        </div>
+        <div class="inventory-modal-card">
+          <h4>Status</h4>
+          <p id="modalFilmStatus" class="inventory-modal-status">
+            –
+          </p>
+          <p id="modalFilmThreshold" class="inventory-modal-text">
+            –
+          </p>
+        </div>
+      </div>
+
+      <div class="inventory-modal-meta">
+        <p>
+          <strong>Last updated:</strong>
+          <span id="modalFilmUpdated">–</span>
+        </p>
+        <p>
+          <strong>By:</strong>
+          <span id="modalFilmRep">–</span>
+        </p>
+      </div>
+
+      <p class="inventory-modal-note">
+        Use the PI tape form to add or remove inventory. This detail view is
+        read-only in this demo.
+      </p>
+    </div>
+  </div>
+</div>
+
+      
     </main>
 
     <footer class="app-footer">
