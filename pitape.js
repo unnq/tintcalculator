@@ -1,4 +1,4 @@
-// pitape.js – Pi tape roll inventory (square-foot based) with live preview
+// pitape.js – Pi tape roll inventory (square-foot based) with live preview + modal
 
 // ---- Film catalog ---------------------------------------------------------
 const PI_FILMS = [
@@ -46,114 +46,21 @@ const PI_FILMS = [
   { id: "cs_black_88", name: "CS Black 88", thicknessMil: 1.5 },
 ];
 
-// ---- math helpers ---------------------------------------------------------
+// ---- Defaults / thresholds -----------------------------------------------
 
-function milToInches(mil) {
-  return mil / 1000;
-}
-
-// Given diameters in inches + thickness in mil, return remaining *linear* length in feet.
-function calcRollLengthFeet(outerDiameterIn, coreDiameterIn, thicknessMil) {
-  if (!outerDiameterIn || !coreDiameterIn || !thicknessMil) return 0;
-  if (outerDiameterIn <= coreDiameterIn) return 0;
-
-  const t = milToInches(thicknessMil); // inches
-  const Do = outerDiameterIn;
-  const Dc = coreDiameterIn;
-
-  // L (inches) = π (Do^2 - Dc^2) / (4 t)
-  const L_inches = Math.PI * (Do * Do - Dc * Dc) / (4 * t);
-  return L_inches / 12; // feet
-}
-
-// Compute new-change payload (no side effects yet)
-function computeUpdatePayload(film) {
-  const action = document.getElementById("piAction").value || "add";
-
-  const fullRolls = parseFloat(
-    document.getElementById("piFullRolls").value
-  );
-  const outerDiameter = parseFloat(
-    document.getElementById("piOuterDiameter").value
-  );
-  const coreDiameter = parseFloat(
-    document.getElementById("piCoreDiameter").value
-  );
-  const rollLengthFt = parseFloat(
-    document.getElementById("piOriginalLength").value
-  );
-  const widthIn = parseFloat(
-    document.getElementById("piWidth").value
-  );
-
-  const safeFullRolls = Number.isFinite(fullRolls) ? Math.max(0, fullRolls) : 0;
-  const safeRollLength = Number.isFinite(rollLengthFt) && rollLengthFt > 0
-    ? rollLengthFt
-    : 100;
-
-  const widthFeet = widthIn && widthIn > 0 ? widthIn / 12 : 40 / 12;
-
-  // linear length via pi tape
-  let partialFeet = 0;
-  if (outerDiameter && coreDiameter && outerDiameter > coreDiameter) {
-    partialFeet = calcRollLengthFeet(
-      outerDiameter,
-      coreDiameter,
-      film.thicknessMil
-    );
-  }
-
-  const partialSqFt = partialFeet * widthFeet;
-  const partialPercentOfRoll = safeRollLength > 0
-    ? (partialFeet / safeRollLength) * 100
-    : 0;
-
-  const fullRollFeet = safeFullRolls * safeRollLength;
-  const fullRollSqFt = fullRollFeet * widthFeet;
-
-  const changeFeetRaw = fullRollFeet + partialFeet;
-  const changeSqFtRaw = fullRollSqFt + partialSqFt;
-
-  const signedChangeFeet = action === "remove" ? -changeFeetRaw : changeFeetRaw;
-  const signedChangeSqFt = action === "remove" ? -changeSqFtRaw : changeSqFtRaw;
-
-  return {
-    action,
-    safeFullRolls,
-    safeRollLength,
-    widthFeet,
-    fullRollFeet,
-    fullRollSqFt,
-    partialFeet,
-    partialSqFt,
-    partialPercentOfRoll,
-    changeFeetRaw,
-    changeSqFtRaw,
-    signedChangeFeet,
-    signedChangeSqFt,
-  };
-}
-
-// ---- inventory storage (localStorage demo) ------------------------
-
-const STORAGE_KEY = "piTapeInventoryByFilm_sqft";
-const REP_KEY = "piTapeRepName";
-
-// Default assumptions for demo rolls
-const DEFAULT_ROLL_LENGTH_FT = 100;
-const DEFAULT_WIDTH_FEET = 40 / 12; // 40" roll
+const DEFAULT_ROLL_LENGTH_FT = 100; // typical full roll length
+const DEFAULT_WIDTH_IN = 40;        // 40" film width
+const DEFAULT_WIDTH_FEET = DEFAULT_WIDTH_IN / 12;
 const DEFAULT_ROLL_SQFT = DEFAULT_ROLL_LENGTH_FT * DEFAULT_WIDTH_FEET;
 
-// Per-film minimum thresholds (sq ft) for “low inventory” highlight
+// per-film minimum sq ft threshold (override a few, else 120)
 const MIN_SQFT_BY_FILM = {
   xr_plus_5: 180,
-  xr_plus_20: 120,
-  cs_black_35: 150,
-  hp_black_15: 100,
-  // other films fall back to a generic threshold
+  xr_plus_20: 150,
+  cs_black_35: 160,
 };
 
-// FULL seed inventory for all films
+// FULL seed inventory for all films (in “roll equivalents”)
 const SEED_INVENTORY = {
   // XR PLUS
   xr_plus_5:   { rolls: 2.3, updatedDaysAgo: 3,  rep: "Alex R." },
@@ -199,59 +106,145 @@ const SEED_INVENTORY = {
   cs_black_88: { rolls: 1.9, updatedDaysAgo: 3,  rep: "Jamie L." },
 };
 
+// ---- math helpers ---------------------------------------------------------
 
-function buildSeedInventory() {
+function milToInches(mil) {
+  return mil / 1000;
+}
+
+// Given diameters in inches + thickness in mil, return remaining *linear* length in feet.
+function calcRollLengthFeet(outerDiameterIn, coreDiameterIn, thicknessMil) {
+  if (!outerDiameterIn || !coreDiameterIn || !thicknessMil) return 0;
+  if (outerDiameterIn <= coreDiameterIn) return 0;
+
+  const t = milToInches(thicknessMil); // inches
+  const Do = outerDiameterIn;
+  const Dc = coreDiameterIn;
+
+  // L (inches) = π (Do^2 - Dc^2) / (4 t)
+  const L_inches = Math.PI * (Do * Do - Dc * Dc) / (4 * t);
+  return L_inches / 12; // feet
+}
+
+// Compute new-change payload (no side effects yet)
+function computeUpdatePayload(film) {
+  const action = document.getElementById("piAction").value || "add";
+
+  const fullRolls = parseFloat(
+    document.getElementById("piFullRolls").value
+  );
+  const outerDiameter = parseFloat(
+    document.getElementById("piOuterDiameter").value
+  );
+  const coreDiameter = parseFloat(
+    document.getElementById("piCoreDiameter").value
+  );
+  const rollLengthFt = parseFloat(
+    document.getElementById("piOriginalLength").value
+  );
+  const widthIn = parseFloat(
+    document.getElementById("piWidth").value
+  );
+
+  const safeFullRolls = Number.isFinite(fullRolls) ? Math.max(0, fullRolls) : 0;
+  const safeRollLength = Number.isFinite(rollLengthFt) && rollLengthFt > 0
+    ? rollLengthFt
+    : DEFAULT_ROLL_LENGTH_FT;
+
+  const widthFeet = widthIn && widthIn > 0 ? widthIn / 12 : DEFAULT_WIDTH_FEET;
+
+  // linear length via pi tape
+  let partialFeet = 0;
+  if (outerDiameter && coreDiameter && outerDiameter > coreDiameter) {
+    partialFeet = calcRollLengthFeet(
+      outerDiameter,
+      coreDiameter,
+      film.thicknessMil
+    );
+  }
+
+  const partialSqFt = partialFeet * widthFeet;
+  const partialPercentOfRoll = safeRollLength > 0
+    ? (partialFeet / safeRollLength) * 100
+    : 0;
+
+  const fullRollFeet = safeFullRolls * safeRollLength;
+  const fullRollSqFt = fullRollFeet * widthFeet;
+
+  const changeFeetRaw = fullRollFeet + partialFeet;
+  const changeSqFtRaw = fullRollSqFt + partialSqFt;
+
+  const signedChangeFeet = action === "remove" ? -changeFeetRaw : changeFeetRaw;
+  const signedChangeSqFt = action === "remove" ? -changeSqFtRaw : changeSqFtRaw;
+
+  return {
+    action,
+    safeFullRolls,
+    safeRollLength,
+    widthFeet,
+    fullRollFeet,
+    fullRollSqFt,
+    partialFeet,
+    partialSqFt,
+    partialPercentOfRoll,
+    changeFeetRaw,
+    changeSqFtRaw,
+    signedChangeFeet,
+    signedChangeSqFt,
+  };
+}
+
+// ---- inventory storage (localStorage demo) ------------------------
+
+const STORAGE_KEY = "piTapeInventoryByFilm_sqft_v2"; // v2 so seeding works clean on new key
+const REP_KEY = "piTapeRepName";
+
+let inventoryByFilm = {};
+// shape: { [filmId]: { filmId, squareFeet, lengthFeet, rollLengthFt, rollSqFt, lastUpdatedAt, lastUpdatedBy } }
+
+function seedInventoryFromRolls() {
   const now = new Date();
-  const result = {};
+  const seeded = {};
 
-  Object.entries(SEED_INVENTORY).forEach(([filmId, cfg]) => {
-    const rolls = cfg.rolls || 0;
+  Object.entries(SEED_INVENTORY).forEach(([filmId, seed]) => {
+    const rolls = seed.rolls ?? 0;
+    const rollSqFt = DEFAULT_ROLL_SQFT;
+    const squareFeet = rolls * rollSqFt;
     const lengthFeet = rolls * DEFAULT_ROLL_LENGTH_FT;
-    const squareFeet = rolls * DEFAULT_ROLL_SQFT;
 
-    const days = cfg.updatedDaysAgo || 0;
-    const updated = new Date(
-      now.getTime() - days * 24 * 60 * 60 * 1000
-    ).toISOString();
+    const daysAgo = seed.updatedDaysAgo ?? 7;
+    const lastUpdatedAt = new Date(now.getTime() - daysAgo * 24 * 60 * 60 * 1000).toISOString();
 
-    result[filmId] = {
+    seeded[filmId] = {
       filmId,
       squareFeet,
       lengthFeet,
       rollLengthFt: DEFAULT_ROLL_LENGTH_FT,
-      rollSqFt: DEFAULT_ROLL_SQFT,
-      lastUpdatedAt: updated,
-      lastUpdatedBy: cfg.rep || "",
+      rollSqFt,
+      lastUpdatedAt,
+      lastUpdatedBy: seed.rep || "",
     };
   });
 
-  return result;
+  return seeded;
 }
-
-let inventoryByFilm = {};
-// shape: { [filmId]: { filmId, squareFeet, lengthFeet, rollLengthFt, rollSqFt, lastUpdatedAt, lastUpdatedBy } }
 
 function loadInventory() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY);
     if (raw) {
       inventoryByFilm = JSON.parse(raw);
-      return;
+    } else {
+      inventoryByFilm = seedInventoryFromRolls();
+      saveInventory();
     }
   } catch (err) {
-    console.warn("Failed to parse stored PI inventory, using seed data.", err);
+    inventoryByFilm = seedInventoryFromRolls();
   }
-
-  // If nothing stored, start with seeded demo data
-  inventoryByFilm = buildSeedInventory();
 }
 
 function saveInventory() {
-  try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(inventoryByFilm));
-  } catch (err) {
-    console.warn("Failed to save PI inventory.", err);
-  }
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(inventoryByFilm));
 }
 
 // ---- UI helpers ---------------------------------------------------
@@ -309,7 +302,7 @@ function renderInventory() {
     const rec = getRecordForFilm(film.id, DEFAULT_ROLL_LENGTH_FT, DEFAULT_ROLL_SQFT);
 
     const tr = document.createElement("tr");
-    tr.dataset.filmId = film.id; // <-- needed so clicks know which film
+    tr.dataset.filmId = film.id;
 
     if (!rec.squareFeet) {
       tr.style.opacity = "0.6";
@@ -373,7 +366,6 @@ function renderInventory() {
     tbody.appendChild(tr);
   });
 }
-
 
 // Live preview of this change, in sq ft
 function updatePreview() {
@@ -548,7 +540,7 @@ function initClearButton() {
     if (!Object.keys(inventoryByFilm).length) return;
     if (!confirm("Clear all demo inventory data from this browser?")) return;
 
-    inventoryByFilm = {};
+    inventoryByFilm = seedInventoryFromRolls();
     saveInventory();
     renderInventory();
     updatePreview();
@@ -571,7 +563,6 @@ function openInventoryModal(filmId) {
   const modal = document.getElementById("inventoryModal");
   if (!modal) return;
 
-  // Fill fields
   const nameEl = document.getElementById("modalFilmName");
   const subtitleEl = document.getElementById("modalFilmSubtitle");
   const statsMainEl = document.getElementById("modalFilmStatsMain");
@@ -632,8 +623,10 @@ function initInventoryRowClicks() {
   });
 
   const modal = document.getElementById("inventoryModal");
+  if (!modal) return;
+
   const closeBtn = document.getElementById("inventoryModalClose");
-  const backdrop = modal ? modal.querySelector(".inventory-modal-backdrop") : null;
+  const backdrop = modal.querySelector(".inventory-modal-backdrop");
 
   if (closeBtn) {
     closeBtn.addEventListener("click", closeInventoryModal);
@@ -649,8 +642,6 @@ function initInventoryRowClicks() {
   });
 }
 
-
-
 // ---- init ---------------------------------------------------------
 
 document.addEventListener("DOMContentLoaded", () => {
@@ -659,6 +650,5 @@ document.addEventListener("DOMContentLoaded", () => {
   initPiForm();
   initClearButton();
   renderInventory();
-  initInventoryRowClicks(); // <-- enable row→modal behavior
+  initInventoryRowClicks();
 });
-
