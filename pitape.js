@@ -112,12 +112,18 @@ function milToInches(mil) {
   return mil / 1000;
 }
 
-// Given diameters in inches + thickness in mil, return remaining *linear* length in feet.
-function calcRollLengthFeet(outerDiameterIn, coreDiameterIn, thicknessMil) {
-  if (!outerDiameterIn || !coreDiameterIn || !thicknessMil) return 0;
+// Pi tape calibration:
+// Core 3.22", full roll 3.93" → 100 ft of film
+// Solving the annulus formula gives an effective wound thickness ~3.32 mil.
+const CALIBRATED_THICKNESS_MIL = 3.32;
+
+// Given diameters in inches, return remaining *linear* length in feet,
+// using calibrated thickness so that 3.93" over 3.22" core ≈ 100 ft.
+function calcRollLengthFeet(outerDiameterIn, coreDiameterIn) {
+  if (!outerDiameterIn || !coreDiameterIn) return 0;
   if (outerDiameterIn <= coreDiameterIn) return 0;
 
-  const t = milToInches(thicknessMil); // inches
+  const t = milToInches(CALIBRATED_THICKNESS_MIL); // inches
   const Do = outerDiameterIn;
   const Dc = coreDiameterIn;
 
@@ -153,13 +159,12 @@ function computeUpdatePayload(film) {
 
   const widthFeet = widthIn && widthIn > 0 ? widthIn / 12 : DEFAULT_WIDTH_FEET;
 
-  // linear length via pi tape
+  // linear length via pi tape (calibrated thickness)
   let partialFeet = 0;
   if (outerDiameter && coreDiameter && outerDiameter > coreDiameter) {
     partialFeet = calcRollLengthFeet(
       outerDiameter,
-      coreDiameter,
-      film.thicknessMil
+      coreDiameter
     );
   }
 
@@ -379,276 +384,4 @@ function updatePreview() {
     return;
   }
 
-  const payload = computeUpdatePayload(film);
-  const {
-    action,
-    safeFullRolls,
-    safeRollLength,
-    widthFeet,
-    fullRollFeet,
-    fullRollSqFt,
-    partialFeet,
-    partialSqFt,
-    partialPercentOfRoll,
-    changeFeetRaw,
-    changeSqFtRaw,
-  } = payload;
-
-  const rollSqFtFallback = safeRollLength * widthFeet;
-  const rec = getRecordForFilm(film.id, safeRollLength, rollSqFtFallback);
-
-  const previewNewSqFt = Math.max(0, rec.squareFeet + payload.signedChangeSqFt);
-  const previewNewFeet = Math.max(0, rec.lengthFeet + payload.signedChangeFeet);
-  const rollSqFt = rec.rollSqFt || rollSqFtFallback || (safeRollLength * widthFeet);
-  const currentFullRollEquiv = rollSqFt > 0 ? rec.squareFeet / rollSqFt : 0;
-  const previewFullRollEquiv = rollSqFt > 0 ? previewNewSqFt / rollSqFt : 0;
-
-  const parts = [];
-  if (safeFullRolls > 0) {
-    parts.push(
-      `${safeFullRolls} full roll(s) ≈ ${fullRollSqFt.toFixed(1)} sq ft (${fullRollFeet.toFixed(
-        1
-      )} ft)`
-    );
-  }
-  if (partialFeet > 0) {
-    parts.push(
-      `pi-taped roll ≈ ${partialSqFt.toFixed(1)} sq ft (${partialFeet.toFixed(
-        1
-      )} ft ≈ ${partialPercentOfRoll.toFixed(0)}% of a ${safeRollLength} ft roll)`
-    );
-  }
-
-  if (!parts.length) {
-    resultEl.innerHTML = `
-      <p><strong>${film.name}</strong></p>
-      <p>No full rolls or pi-tape values entered yet.</p>
-      <p><strong>Current total:</strong> ${rec.squareFeet.toFixed(
-        1
-      )} sq ft (${rec.lengthFeet.toFixed(1)} ft, ${currentFullRollEquiv.toFixed(
-        2
-      )} rolls)</p>
-    `;
-    return;
-  }
-
-  const directionLabel = action === "remove" ? "removed from" : "added to";
-  const sign = action === "remove" ? "-" : "+";
-
-  resultEl.innerHTML = `
-    <p><strong>${film.name}</strong></p>
-    <p><strong>This update (preview):</strong> ${parts.join(" + ")}</p>
-    <p><strong>Change:</strong> ${sign}${changeSqFtRaw.toFixed(
-      1
-    )} sq ft (${sign}${changeFeetRaw.toFixed(1)} ft) ${directionLabel} inventory.</p>
-    <hr />
-    <p><strong>Current total:</strong> ${rec.squareFeet.toFixed(
-      1
-    )} sq ft (${rec.lengthFeet.toFixed(1)} ft, ${currentFullRollEquiv.toFixed(
-      2
-    )} rolls)</p>
-    <p><strong>After update:</strong> ${previewNewSqFt.toFixed(
-      1
-    )} sq ft (${previewNewFeet.toFixed(1)} ft, ${previewFullRollEquiv.toFixed(
-      2
-    )} rolls)</p>
-    ${
-      partialFeet > 0
-        ? `<p class="helper-text">Pi-taped roll area uses width ${widthFeet.toFixed(
-            2
-          )} ft (${(widthFeet * 12).toFixed(0)}").</p>`
-        : ""
-    }
-  `;
-}
-
-// ---- form + buttons ------------------------------------------------
-
-function initPiForm() {
-  const form = document.getElementById("piForm");
-  const repInput = document.getElementById("piRep");
-
-  if (!form) return;
-
-  // load stored rep
-  const storedRep = localStorage.getItem(REP_KEY) || "";
-  if (repInput) {
-    repInput.value = storedRep;
-    repInput.addEventListener("input", () => {
-      localStorage.setItem(REP_KEY, repInput.value.trim());
-    });
-  }
-
-  // Live preview on any change
-  const liveInputs = [
-    "piFilm",
-    "piAction",
-    "piFullRolls",
-    "piOuterDiameter",
-    "piCoreDiameter",
-    "piOriginalLength",
-    "piWidth",
-  ];
-  liveInputs.forEach((id) => {
-    const el = document.getElementById(id);
-    if (!el) return;
-    const evt = el.tagName === "SELECT" ? "change" : "input";
-    el.addEventListener(evt, updatePreview);
-  });
-
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-
-    const filmId = document.getElementById("piFilm").value;
-    const film = PI_FILMS.find((f) => f.id === filmId);
-    if (!film) return;
-
-    const repName = repInput ? repInput.value.trim() : "";
-
-    const payload = computeUpdatePayload(film);
-    const {
-      safeRollLength,
-      widthFeet,
-      signedChangeFeet,
-      signedChangeSqFt,
-    } = payload;
-
-    const rollSqFtFallback = safeRollLength * widthFeet;
-    const rec = getRecordForFilm(film.id, safeRollLength, rollSqFtFallback);
-
-    rec.squareFeet = Math.max(0, rec.squareFeet + signedChangeSqFt);
-    rec.lengthFeet = Math.max(0, rec.lengthFeet + signedChangeFeet);
-    rec.rollLengthFt = safeRollLength;
-    rec.rollSqFt = rollSqFtFallback;
-    rec.lastUpdatedAt = new Date().toISOString();
-    rec.lastUpdatedBy = repName;
-
-    inventoryByFilm[film.id] = rec;
-    saveInventory();
-    renderInventory();
-    updatePreview(); // refresh with new "current total"
-  });
-
-  updatePreview(); // initial
-}
-
-function initClearButton() {
-  const clearBtn = document.getElementById("clearInventoryBtn");
-  if (!clearBtn) return;
-
-  clearBtn.addEventListener("click", () => {
-    if (!Object.keys(inventoryByFilm).length) return;
-    if (!confirm("Clear all demo inventory data from this browser?")) return;
-
-    inventoryByFilm = seedInventoryFromRolls();
-    saveInventory();
-    renderInventory();
-    updatePreview();
-  });
-}
-
-// ---- Modal helpers ------------------------------------------------
-
-function openInventoryModal(filmId) {
-  const film = PI_FILMS.find((f) => f.id === filmId);
-  if (!film) return;
-
-  const rec = getRecordForFilm(film.id, DEFAULT_ROLL_LENGTH_FT, DEFAULT_ROLL_SQFT);
-  const rollSqFt = rec.rollSqFt || DEFAULT_ROLL_SQFT;
-  const fullRollEquiv = rollSqFt > 0 ? rec.squareFeet / rollSqFt : 0;
-
-  const minSqFt = MIN_SQFT_BY_FILM[film.id] ?? 120;
-  const isLow = rec.squareFeet < minSqFt;
-
-  const modal = document.getElementById("inventoryModal");
-  if (!modal) return;
-
-  const nameEl = document.getElementById("modalFilmName");
-  const subtitleEl = document.getElementById("modalFilmSubtitle");
-  const statsMainEl = document.getElementById("modalFilmStatsMain");
-  const statsSecondaryEl = document.getElementById("modalFilmStatsSecondary");
-  const statusEl = document.getElementById("modalFilmStatus");
-  const thresholdEl = document.getElementById("modalFilmThreshold");
-  const updatedEl = document.getElementById("modalFilmUpdated");
-  const repEl = document.getElementById("modalFilmRep");
-
-  if (nameEl) nameEl.textContent = film.name;
-  if (subtitleEl) subtitleEl.textContent = "Inventory detail";
-
-  if (statsMainEl) {
-    statsMainEl.textContent = `${rec.squareFeet.toFixed(1)} sq ft · ${fullRollEquiv.toFixed(
-      2
-    )} rolls`;
-  }
-  if (statsSecondaryEl) {
-    statsSecondaryEl.textContent = `${rec.lengthFeet.toFixed(1)} ft estimated remaining`;
-  }
-
-  if (statusEl) {
-    statusEl.textContent = isLow ? "Low inventory" : "In stock";
-    statusEl.style.color = isLow ? "#b91c1c" : "#16a34a";
-  }
-
-  if (thresholdEl) {
-    thresholdEl.textContent = `Minimum target: ${minSqFt.toFixed(
-      0
-    )} sq ft · Currently ${rec.squareFeet.toFixed(1)} sq ft`;
-  }
-
-  if (updatedEl) {
-    updatedEl.textContent = formatDateTime(rec.lastUpdatedAt);
-  }
-
-  if (repEl) {
-    repEl.textContent = rec.lastUpdatedBy || "—";
-  }
-
-  modal.classList.remove("hidden");
-}
-
-function closeInventoryModal() {
-  const modal = document.getElementById("inventoryModal");
-  if (!modal) return;
-  modal.classList.add("hidden");
-}
-
-function initInventoryRowClicks() {
-  const tbody = document.getElementById("inventoryBody");
-  if (!tbody) return;
-
-  tbody.addEventListener("click", (event) => {
-    const tr = event.target.closest("tr");
-    if (!tr || !tr.dataset.filmId) return;
-    openInventoryModal(tr.dataset.filmId);
-  });
-
-  const modal = document.getElementById("inventoryModal");
-  if (!modal) return;
-
-  const closeBtn = document.getElementById("inventoryModalClose");
-  const backdrop = modal.querySelector(".inventory-modal-backdrop");
-
-  if (closeBtn) {
-    closeBtn.addEventListener("click", closeInventoryModal);
-  }
-  if (backdrop) {
-    backdrop.addEventListener("click", closeInventoryModal);
-  }
-
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape") {
-      closeInventoryModal();
-    }
-  });
-}
-
-// ---- init ---------------------------------------------------------
-
-document.addEventListener("DOMContentLoaded", () => {
-  loadInventory();
-  renderFilmOptions();
-  initPiForm();
-  initClearButton();
-  renderInventory();
-  initInventoryRowClicks();
-});
+  const payload = computeUpdatePayload(f
